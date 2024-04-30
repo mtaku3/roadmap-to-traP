@@ -1,0 +1,15 @@
+services:
+  web:
+    build:
+      context: .
+      target: development
+    volumes:
+      - .:/home/bun/app:cached
+      - node_modules:/home/bun/app/node_modules
+    develop:
+      watch:
+        - action: rebuild
+          path: ./bun.lockb
+
+volumes:
+  node_modules:
