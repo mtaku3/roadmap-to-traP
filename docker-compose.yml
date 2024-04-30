@@ -13,10 +13,10 @@ services:
           path: .
           target: /home/node/app
         - action: sync+restart
-          path: .env.local
+          path: ./.env.local
           target: /home/node/app/.env.local
         - action: sync+restart
-          path: .env.development.local
+          path: ./.env.development.local
           target: /home/node/app/.env.development.local
         - action: sync+restart
           path: ./package-lock.json

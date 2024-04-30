@@ -10,6 +10,7 @@ FROM base as development
 
 ENV NODE_ENV development
 
+RUN mkdir -p /home/node/app/node_modules
 COPY docker-entrypoint.sh /usr/local/bin
 ENTRYPOINT ["docker-entrypoint.sh"]
 
