@@ -1,0 +1,6 @@
+version: "3"
+
+tasks:
+  start:
+    cmds:
+      - docker compose watch --no-up & docker compose up --build
