@@ -21,6 +21,9 @@ services:
         - action: sync+restart
           path: ./package-lock.json
           target: /home/node/app/package-lock.json
+        - action: sync+restart
+          path: ./src/modules/infra/prisma/schema.prisma
+          target: /home/node/app/src/modules/infra/prisma/schema.prisma
     environment:
       DATABASE_URL: mysql://root:password@db:3306/dev
   db:
