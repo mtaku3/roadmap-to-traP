@@ -1,4 +1,4 @@
-FROM node:21.3.0 as base
+FROM node:22.1.0 as base
 
 USER node
 WORKDIR /home/node/app
