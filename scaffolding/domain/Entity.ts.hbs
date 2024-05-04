@@ -1,0 +1,45 @@
+{{#if isEntity}}
+import { Entity } from "@/modules/core/Entity";
+{{/if}}
+{{#if isAggregateRoot}}
+import { AggregateRoot } from "@/modules/core/AggregateRoot";
+{{/if}}
+import { {{{Name}}}Id } from "./Identifier";
+
+export interface {{{Name}}}Props {
+{{#each props}}
+  {{{name}}}{{#if isNullable}}?{{/if}}: {{{typeWithoutUndefined}}};
+{{/each}}
+}
+
+export class {{{Name}}} extends {{{type}}}<{{{Name}}}Props, {{{Name}}}Id> {
+  static create(
+{{#each props}}
+    {{{name}}}: {{{type}}},
+{{/each}}
+  ) {
+    return new {{{Name}}}(
+      {
+{{#each props}}
+        {{{name}}},
+{{/each}}
+      },
+      {{{Name}}}Id.next(),
+    );
+  }
+
+{{#each props}}
+  get {{{name}}}(): {{{type}}} {
+    return this._props{{#if isNullable}}?{{/if}}.{{{name}}};
+  }
+
+{{/each}}
+
+{{#each props}}
+
+  set{{{Name}}}({{{name}}}: {{{type}}}) {
+    this._props.{{{name}}} = {{{name}}};
+  }
+{{/each}}
+}
+

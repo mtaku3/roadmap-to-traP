@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "prisma": {
-    "schema": "src/service/infra/prisma/schema.prisma"
+    "schema": "src/modules/infra/prisma/schema.prisma"
   },
   "scripts": {
     "dev": "next dev",
@@ -23,7 +23,10 @@
     "@prisma/client": "^5.13.0",
     "@t3-oss/env-nextjs": "^0.10.1",
     "awilix": "^10.0.2",
+    "axios": "^1.6.8",
+    "jose": "^5.2.4",
     "next": "14.2.3",
+    "openid-client": "^5.6.5",
     "react": "^18",
     "react-dom": "^18",
     "uuid": "^9.0.1",
@@ -38,6 +41,7 @@
     "eslint-config-next": "14.2.3",
     "husky": "^9.0.11",
     "lint-staged": "^15.2.2",
+    "plop": "^4.0.1",
     "postcss": "^8",
     "prettier": "^3.2.5",
     "prisma": "^5.13.0",

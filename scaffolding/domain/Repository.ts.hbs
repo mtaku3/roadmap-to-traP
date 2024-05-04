@@ -1,0 +1,63 @@
+import { PrismaClient } from "@prisma/client";
+import { I{{{Name}}}Repository } from "@/modules/domain/{{{Name}}}/IRepository";
+import { {{{Name}}} } from "@/modules/domain/{{{Name}}}/Entity";
+import { {{{Name}}}Id } from "@/modules/domain/{{{Name}}}/Identifier";
+
+export class {{{Name}}}Repository implements I{{{Name}}}Repository {
+  constructor(private readonly prisma: PrismaClient) {}
+
+  async findById(id: {{{Name}}}Id): Promise<{{{Name}}} | undefined> {
+    const res = await this.prisma.{{{name}}}.findUnique({
+      where: {
+        id: id.toString(),
+      },
+    });
+    if (res == null) {
+      return undefined;
+    }
+    return new {{{Name}}}(
+      {
+{{#each props}}
+        {{{name}}}: res{{#if isNullable}}?{{/if}}.{{{name}}},
+{{/each}}
+      },
+      new {{{Name}}}Id(res.id),
+    );
+  }
+
+  async exist(id: {{{Name}}}Id): Promise<boolean> {
+    const res = await this.prisma.{{{name}}}.count({
+      where: {
+        id: id.toString(),
+      },
+    });
+    return res != 0;
+  }
+
+  async save({{{name}}}: {{{Name}}}): Promise<void> {
+    await this.prisma.{{{name}}}.upsert({
+      create: {
+        id: {{{name}}}.id.toString(),
+{{#each props}}
+        {{{name}}}: {{{../name}}}{{#if isNullable}}?{{/if}}.{{{name}}},
+{{/each}}
+      },
+      update: {
+{{#each props}}
+        {{{name}}}: {{{../name}}}{{#if isNullable}}?{{/if}}.{{{name}}},
+{{/each}}
+      },
+      where: {
+        id: {{{name}}}.id.toString(),
+      },
+    });
+  }
+
+  async delete(id: {{{Name}}}Id): Promise<void> {
+    await this.prisma.{{{name}}}.delete({
+      where: {
+        id: id.toString(),
+      },
+    });
+  }
+}
