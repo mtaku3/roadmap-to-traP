@@ -44,12 +44,7 @@ export function authenticate(
 
       let userInfoResponse;
       try {
-        userInfoResponse = await axios.get<{
-          id: string;
-          name: string;
-          displayName: string;
-          iconFileId: string;
-        }>("https://q.trap.jp/api/v3/users/me", {
+        userInfoResponse = await di.cradle.traqMeApi.getMe({
           headers: { Authorization: `Bearer ${payload.access_token}` },
         });
       } catch (e) {

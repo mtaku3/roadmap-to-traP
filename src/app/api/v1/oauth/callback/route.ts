@@ -87,12 +87,7 @@ export async function GET(req: NextRequest) {
 
   let userInfoResponse;
   try {
-    userInfoResponse = await axios.get<{
-      id: string;
-      name: string;
-      displayName: string;
-      iconFileId: string;
-    }>("https://q.trap.jp/api/v3/users/me", {
+    userInfoResponse = await di.cradle.traqMeApi.getMe({
       headers: { Authorization: `Bearer ${tokenResponse.data.access_token}` },
     });
   } catch (e) {
