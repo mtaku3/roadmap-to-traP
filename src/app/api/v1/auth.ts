@@ -42,21 +42,6 @@ export function authenticate(
         );
       }
 
-      let userInfoResponse;
-      try {
-        userInfoResponse = await di.cradle.traqMeApi.getMe({
-          headers: { Authorization: `Bearer ${payload.access_token}` },
-        });
-      } catch (e) {
-        return NextResponse.json(
-          {
-            message:
-              "Access token does not have enough permission to get user info or is already expired",
-          },
-          { status: 401 },
-        );
-      }
-
       let user;
       try {
         user = (
@@ -72,24 +57,6 @@ export function authenticate(
         return NextResponse.json(
           {
             message: "Failed to find user by id",
-          },
-          { status: 500 },
-        );
-      }
-
-      try {
-        user = (
-          await di.cradle.userController.createOrUpdate({
-            id: user.id,
-            name: userInfoResponse.data.name,
-            displayName: userInfoResponse.data.displayName,
-            iconFileId: userInfoResponse.data.iconFileId,
-          })
-        ).user;
-      } catch (e) {
-        return NextResponse.json(
-          {
-            message: "Failed to create or update user",
           },
           { status: 500 },
         );

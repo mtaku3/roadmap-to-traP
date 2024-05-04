@@ -103,18 +103,22 @@ export async function GET(req: NextRequest) {
   let user;
   try {
     user = (
-      await di.cradle.userController.createOrUpdate({
+      await di.cradle.userController.findById({
         id: new UserId(userInfoResponse.data.id),
-        name: userInfoResponse.data.name,
-        displayName: userInfoResponse.data.displayName,
-        iconFileId: userInfoResponse.data.iconFileId,
       })
     ).user;
+    if (user == null) {
+      return NextResponse.json(
+        {
+          message: "Could not find user by id",
+        },
+        { status: 404 },
+      );
+    }
   } catch (e) {
-    console.error(e);
     return NextResponse.json(
       {
-        message: "User could not be created or updated",
+        message: "Failed to retrieve user",
       },
       { status: 500 },
     );
