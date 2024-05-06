@@ -5,7 +5,6 @@ import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import { decryptAndVerify } from "./jose";
 import { UserId } from "@/modules/domain/User/Identifier";
-import axios from "axios";
 
 export interface OAuthSessionJWTPayload {
   code_verifier: string;
@@ -20,6 +19,7 @@ export interface AppAuthSessionJWTPayload {
 
 export interface NextContext {
   user?: User;
+  session?: AppAuthSessionJWTPayload;
 }
 
 export function authenticate(

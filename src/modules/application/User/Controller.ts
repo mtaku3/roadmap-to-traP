@@ -5,19 +5,31 @@ import { UserId } from "@/modules/domain/User/Identifier";
 export class UserController {
   constructor(private readonly userRepository: IUserRepository) {}
 
-  /* __PLOP_FUNCTION_APPEND__ */
-  async findById(
-    req: FindUserByIdRequestDTO,
-  ): Promise<FindUserByIdResponseDTO> {
+  async createUser(req: CreateUserRequestDTO): Promise<CreateUserResponseDTO> {
+    await this.userRepository.create(req.user);
+    return {};
+  }
+
+  async findById(req: FindByIdRequestDTO): Promise<FindByIdResponseDTO> {
     const user = await this.userRepository.findById(req.id);
     return { user };
   }
+
+  /* __PLOP_FUNCTION_APPEND__ */
 }
 
-export interface FindUserByIdRequestDTO {
+export interface CreateUserRequestDTO {
+  user: User;
+}
+
+export interface CreateUserResponseDTO {}
+
+export interface FindByIdRequestDTO {
   id: UserId;
 }
 
-export interface FindUserByIdResponseDTO {
-  user: User | undefined;
+export interface FindByIdResponseDTO {
+  user?: User;
 }
+
+/* __PLOP_DTO_APPEND__ */

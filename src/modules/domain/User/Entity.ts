@@ -35,4 +35,16 @@ export class User extends AggregateRoot<UserProps, UserId> {
   get iconFileId(): string {
     return this._props.iconFileId;
   }
+
+  setName(name: string) {
+    this._props.name = name;
+  }
+
+  setDisplayName(displayName: string) {
+    this._props.displayName = displayName;
+  }
+
+  setIconFileId(iconFileId: string) {
+    this._props.iconFileId = iconFileId;
+  }
 }

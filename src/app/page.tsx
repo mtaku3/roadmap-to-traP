@@ -1,7 +1,5 @@
 import Image from "next/image";
 
-import { di } from "@/service/di";
-
 export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
@@ -109,6 +107,7 @@ export default function Home() {
             Instantly deploy your Next.js site to a shareable URL with Vercel.
           </p>
         </a>
+        <a href="/api/v1/oauth/signin">Sign In</a>
       </div>
     </main>
   );

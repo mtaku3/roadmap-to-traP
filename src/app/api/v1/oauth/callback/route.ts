@@ -6,6 +6,7 @@ import axios from "axios";
 import { di } from "@/modules/di";
 import { UserId } from "@/modules/domain/User/Identifier";
 import { OAuthSessionJWTPayload } from "../../auth";
+import { User } from "@/modules/domain/User/Entity";
 
 export async function GET(req: NextRequest) {
   const searchParams = req.nextUrl.searchParams;
@@ -102,23 +103,30 @@ export async function GET(req: NextRequest) {
 
   let user;
   try {
+    const userId = new UserId(userInfoResponse.data.id);
     user = (
       await di.cradle.userController.findById({
-        id: new UserId(userInfoResponse.data.id),
+        id: userId,
       })
     ).user;
     if (user == null) {
-      return NextResponse.json(
-        {
-          message: "Could not find user by id",
-        },
-        { status: 404 },
+      user = User.create(
+        userId,
+        userInfoResponse.data.name,
+        userInfoResponse.data.displayName,
+        userInfoResponse.data.iconFileId,
       );
+      await di.cradle.userRepository.create(user);
+    } else {
+      user.setName(userInfoResponse.data.name);
+      user.setDisplayName(userInfoResponse.data.displayName);
+      user.setIconFileId(userInfoResponse.data.iconFileId);
+      await di.cradle.userRepository.update(user);
     }
   } catch (e) {
     return NextResponse.json(
       {
-        message: "Failed to retrieve user",
+        message: "Failed to create or update user",
       },
       { status: 500 },
     );

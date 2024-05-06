@@ -1,54 +1,68 @@
+import { PrismaClient } from "@prisma/client";
 import { IUserRepository } from "@/modules/domain/User/IRepository";
 import { User } from "@/modules/domain/User/Entity";
 import { UserId } from "@/modules/domain/User/Identifier";
-import { type UserApiFactory } from "@/modules/external/traq/api/user-api";
-import { AxiosError } from "axios";
 
 export class UserRepository implements IUserRepository {
-  constructor(
-    private readonly traqUserApi: ReturnType<typeof UserApiFactory>,
-  ) {}
+  constructor(private readonly prisma: PrismaClient) {}
 
   async findById(id: UserId): Promise<User | undefined> {
-    let res;
-    try {
-      res = await this.traqUserApi.getUser(id.toString());
-    } catch (e) {
-      if (e instanceof AxiosError && e.response?.status === 404) {
-        return undefined;
-      } else {
-        throw e;
-      }
+    const res = await this.prisma.user.findUnique({
+      where: {
+        id: id.toString(),
+      },
+    });
+    if (res == null) {
+      return undefined;
     }
-
     return new User(
       {
-        name: res.data.name,
-        displayName: res.data.displayName,
-        iconFileId: res.data.iconFileId,
+        name: res.name,
+        displayName: res.displayName,
+        iconFileId: res.iconFileId,
       },
-      new UserId(res.data.id),
+      new UserId(res.id),
     );
   }
 
   async exist(id: UserId): Promise<boolean> {
-    try {
-      await this.traqUserApi.getUser(id.toString());
-    } catch (e) {
-      if (e instanceof AxiosError && e.response?.status === 404) {
-        return false;
-      } else {
-        throw e;
-      }
-    }
-    return true;
+    const res = await this.prisma.user.count({
+      where: {
+        id: id.toString(),
+      },
+    });
+    return res != 0;
   }
 
-  async save(user: User): Promise<void> {
-    return Promise.reject();
+  async create(user: User): Promise<void> {
+    await this.prisma.user.create({
+      data: {
+        id: user.id.toString(),
+        name: user.name,
+        displayName: user.displayName,
+        iconFileId: user.iconFileId,
+      },
+    });
+  }
+
+  async update(user: User): Promise<void> {
+    await this.prisma.user.update({
+      data: {
+        name: user.name,
+        displayName: user.displayName,
+        iconFileId: user.iconFileId,
+      },
+      where: {
+        id: user.id.toString(),
+      },
+    });
   }
 
   async delete(id: UserId): Promise<void> {
-    return Promise.reject();
+    await this.prisma.user.delete({
+      where: {
+        id: id.toString(),
+      },
+    });
   }
 }

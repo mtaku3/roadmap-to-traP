@@ -118,13 +118,14 @@ export default function Generators(
       return [
         {
           type: "append",
+          pattern: /(?=\n\/\* __PLOP_DTO_APPEND__ \*\/)/,
           path: "src/modules/application/{{{Domain}}}/Controller.ts",
           templateFile: "scaffolding/use-case/DTO.ts.hbs",
           data,
         },
         {
           type: "append",
-          pattern: "/* __PLOP_FUNCTION_APPEND__ */",
+          pattern: /(?=\n  \/\* __PLOP_FUNCTION_APPEND__ \*\/)/,
           path: "src/modules/application/{{{Domain}}}/Controller.ts",
           templateFile: "scaffolding/use-case/function.ts.hbs",
           data,
