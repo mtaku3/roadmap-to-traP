@@ -1,5 +1,5 @@
-{{#if isEntity}}
 import { Entity } from "@/modules/core/Entity";
+{{#if isEntity}}
 {{/if}}
 {{#if isAggregateRoot}}
 import { AggregateRoot } from "@/modules/core/AggregateRoot";
@@ -29,17 +29,50 @@ export class {{{Name}}} extends {{{type}}}<{{{Name}}}Props, {{{Name}}}Id> {
   }
 
 {{#each props}}
+{{#if isArray}}
+  get {{{name}}}(): {{{type}}} {
+    return this._props{{#if isNullable}}?{{/if}}.{{{name}}} != null ? [...this._props.{{{name}}}] : this._props{{#if isNullable}}?{{/if}}.{{{name}}};
+  }
+
+{{else}}
   get {{{name}}}(): {{{type}}} {
     return this._props{{#if isNullable}}?{{/if}}.{{{name}}};
   }
 
+{{/if}}
 {{/each}}
 
 {{#each props}}
+{{#if isArray}}
+
+  add{{{singularize Name}}}({{{singularize name}}}: {{{arrayElementType}}}) {
+    {{#if isNullable}}
+    if (this._props{{#if isNullable}}?{{/if}}.{{{name}}} == null) {
+      this._props.{{{name}}} = [{{{singularize name}}}];
+    } else {
+      this._props.{{{name}}}.push({{{singularize name}}});
+    }
+    {{else}}
+    this._props.{{{name}}}.push({{{singularize name}}});
+    {{/if}}
+  }
+
+  remove{{{singularize Name}}}({{{singularize name}}}: {{{arrayElementType}}}) {
+    {{#if isNullable}}
+    if (this._props{{#if isNullable}}?{{/if}}.{{{name}}} == null) {
+      return;
+    }
+    this._props.{{{name}}} = this._props.{{{name}}}.filter((x) => x instanceof {{{singularize Name}}} ? x.id.equalsTo({{{singularize name}}}.id) : x !== {{{singularize name}}});
+    {{else}}
+    this._props.{{{name}}} = this._props.{{{name}}}.filter((x) => x instanceof {{{singularize Name}}} ? x.id.equalsTo({{{singularize name}}}.id) : x !== {{{singularize name}}});
+    {{/if}}
+  }
+{{else}}
 
   set{{{Name}}}({{{name}}}: {{{type}}}) {
     this._props.{{{name}}} = {{{name}}};
   }
+{{/if}}
 {{/each}}
 }
 

@@ -1,3 +1,5 @@
+import pluralize from "pluralize";
+
 export default function Generators(
   /** @type{import('plop').NodePlopAPI} */
   plop,
@@ -37,14 +39,25 @@ export default function Generators(
             const typeWithoutUndefined = type
               .split("|")
               .map((x) => x.trim())
-              .filter((x) => x != "undefined")
+              .filter((x) => x !== "undefined")
               .join(" | ");
+            const typeWithoutUndefinedAndNull = type
+              .split("|")
+              .map((x) => x.trim())
+              .filter((x) => x !== "undefined" && x !== "null");
+            const isArray =
+              typeWithoutUndefinedAndNull.length === 1 &&
+              typeWithoutUndefinedAndNull[0].endsWith("[]");
             return {
               name,
               Name: toUpperCaseFirst(name),
               type,
               typeWithoutUndefined,
               isNullable: type.includes("undefined") || type.includes("null"),
+              isArray,
+              arrayElementType: isArray
+                ? typeWithoutUndefinedAndNull[0].slice(0, -2)
+                : undefined,
             };
           }),
       };
@@ -133,6 +146,9 @@ export default function Generators(
       ];
     },
   });
+
+  plop.setHelper("pluralize", (value) => pluralize.plural(value));
+  plop.setHelper("singularize", (value) => pluralize.singular(value));
 }
 
 function toLowerCaseFirst(str) {
