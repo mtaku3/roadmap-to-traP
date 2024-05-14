@@ -7,9 +7,66 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model AppConfig {
+  id           String     @id @default(uuid())
+  schoolYear   SchoolYear @relation(fields: [schoolYearId], references: [id])
+  schoolYearId String
+}
+
 model User {
-  id          String @id
+  id          String @id @default(uuid())
   name        String
   displayName String
   iconFileId  String
+}
+
+model SchoolYear {
+  id        String      @id @default(uuid())
+  name      String
+  value     Int         @unique
+  Workshop  Workshop[]
+  AppConfig AppConfig[]
+}
+
+model WorkshopDependency {
+  id                    String                 @id @default(uuid())
+  workshop              Workshop               @relation(name: "from", fields: [workshopId], references: [id])
+  workshopId            String
+  workshopDependentOn   Workshop               @relation(name: "to", fields: [workshopDependentOnId], references: [id])
+  workshopDependentOnId String
+  dependencyType        WorkshopDependencyType
+
+  @@unique([workshopId, workshopDependentOnId])
+}
+
+enum WorkshopDependencyType {
+  REQUIRED
+  RECOMMENDED
+}
+
+model Workshop {
+  id                   String               @id @default(uuid())
+  name                 String
+  description          String
+  courses              Course[]
+  workshopsDependentOn WorkshopDependency[] @relation(name: "from")
+  workshopsReliedOn    WorkshopDependency[] @relation(name: "to")
+  schoolYear           SchoolYear           @relation(fields: [schoolYearId], references: [id])
+  schoolYearId         String
+}
+
+model Course {
+  id          String   @id @default(uuid())
+  name        String
+  description String
+  order       Int
+  workshop    Workshop @relation(fields: [workshopId], references: [id])
+  workshopId  String
+  events      Event[]
+}
+
+model Event {
+  id       String @id
+  course   Course @relation(fields: [courseId], references: [id])
+  courseId String
 }

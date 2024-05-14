@@ -3,5 +3,11 @@ set -e
 
 npm install
 npx prisma generate
+npx prisma db seed
 
-exec "$@"
+
+npx prisma studio &
+npm run dev &
+
+wait -n
+exit $?

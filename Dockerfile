@@ -14,8 +14,6 @@ RUN mkdir -p /home/node/app/node_modules
 COPY docker-entrypoint.sh /usr/local/bin
 ENTRYPOINT ["docker-entrypoint.sh"]
 
-CMD ["npm", "run", "dev"]
-
 
 FROM base as production
 

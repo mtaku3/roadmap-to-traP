@@ -1,4 +1,4 @@
-import { env } from "@/env.mjs";
+import { env } from "@/env";
 import { di } from "@/modules/di";
 import { User } from "@/modules/domain/User/Entity";
 import { cookies } from "next/headers";
@@ -22,7 +22,31 @@ export interface NextContext {
   session?: AppAuthSessionJWTPayload;
 }
 
-export function authenticate(
+export async function authenticate(jwt: string) {
+  let payload;
+  try {
+    payload = await decryptAndVerify<AppAuthSessionJWTPayload>(jwt);
+  } catch (e) {
+    throw new AuthMiddlewareException(
+      "Failed to decrypt and verify app auth session",
+    );
+  }
+
+  let user;
+  try {
+    user = (
+      await di.cradle.userController.findById({
+        id: new UserId(payload.id),
+      })
+    )?.user;
+  } catch (e) {
+    throw new AuthMiddlewareException("Failed to find user by id");
+  }
+
+  return user;
+}
+
+export function nextAuthMiddleware(
   handler: (req: NextRequest, ctx: NextContext) => Promise<NextResponse>,
 ) {
   return async (req: NextRequest) => {
@@ -30,39 +54,17 @@ export function authenticate(
     if (appAuthJwt == null) {
       return await handler(req, {});
     } else {
-      let payload;
-      try {
-        payload = await decryptAndVerify<AppAuthSessionJWTPayload>(appAuthJwt);
-      } catch (e) {
-        return NextResponse.json(
-          {
-            message: "Failed to decrypt and verify app auth session",
-          },
-          { status: 500 },
-        );
-      }
-
       let user;
       try {
-        user = (
-          await di.cradle.userController.findById({
-            id: new UserId(payload.id),
-          })
-        )?.user;
-        if (user == null) {
-          cookies().delete(env.APP_AUTH_SESSION_COOKIE_NAME);
-          return await handler(req, {});
-        }
+        user = await authenticate(appAuthJwt);
       } catch (e) {
-        return NextResponse.json(
-          {
-            message: "Failed to find user by id",
-          },
-          { status: 500 },
-        );
+        let message = e instanceof Error ? e.message : undefined;
+        return NextResponse.json({ message }, { status: 500 });
       }
 
       return await handler(req, { user });
     }
   };
 }
+
+export class AuthMiddlewareException extends Error {}

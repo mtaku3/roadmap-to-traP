@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
-import { env } from "@/env.mjs";
+import { env } from "@/env";
 import { generators } from "openid-client";
-import { signAndEncrypt } from "../../jose";
+import { signAndEncrypt } from "../jose";
 import { cookies } from "next/headers";
-import { authenticate } from "../../auth";
+import { nextAuthMiddleware } from "../auth";
 
-export const GET = authenticate(async (req, ctx) => {
+export const GET = nextAuthMiddleware(async (req, ctx) => {
   if (ctx.user != null) {
     return NextResponse.redirect(new URL("/", req.url));
   }

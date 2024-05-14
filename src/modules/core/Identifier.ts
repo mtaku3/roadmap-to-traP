@@ -15,4 +15,8 @@ export abstract class Identifier implements IValueObject {
   toString(): string {
     return this._value;
   }
+
+  toJSON(): string {
+    return this.toString();
+  }
 }

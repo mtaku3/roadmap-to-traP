@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import { authenticate } from "../../auth";
+import { nextAuthMiddleware } from "../auth";
 import axios from "axios";
 import { cookies } from "next/headers";
-import { env } from "@/env.mjs";
+import { env } from "@/env";
 
-export const DELETE = authenticate(async (req, ctx) => {
+export const DELETE = nextAuthMiddleware(async (req, ctx) => {
   if (ctx.user == null) {
     return NextResponse.json(
       {

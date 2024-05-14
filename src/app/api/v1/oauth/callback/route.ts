@@ -1,11 +1,11 @@
-import { env } from "@/env.mjs";
+import { env } from "@/env";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
-import { decryptAndVerify, signAndEncrypt } from "../../jose";
+import { decryptAndVerify, signAndEncrypt } from "../jose";
 import axios from "axios";
 import { di } from "@/modules/di";
 import { UserId } from "@/modules/domain/User/Identifier";
-import { OAuthSessionJWTPayload } from "../../auth";
+import { OAuthSessionJWTPayload } from "../auth";
 import { User } from "@/modules/domain/User/Entity";
 
 export async function GET(req: NextRequest) {

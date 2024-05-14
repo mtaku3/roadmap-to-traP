@@ -18,6 +18,37 @@ export default function Generators(
         choices: ["Entity", "AggregateRoot"],
       },
       {
+        type: "checkbox",
+        name: "_target",
+        message: "Which ones you want to generate?",
+        choices: [
+          "Controller",
+          "ControllerException",
+          "Repository",
+          "RepositoryException",
+          "IRepository",
+          "Entity",
+          "Identifier",
+          "DomainException",
+        ],
+        default: (ans) => {
+          if (ans._type === "Entity") {
+            return ["Entity", "Identifier", "DomainException"];
+          } else if (ans._type === "AggregateRoot") {
+            return [
+              "Controller",
+              "ControllerException",
+              "Repository",
+              "RepositoryException",
+              "IRepository",
+              "Entity",
+              "Identifier",
+              "DomainException",
+            ];
+          }
+        },
+      },
+      {
         type: "input",
         name: "_props",
         message:
@@ -61,50 +92,75 @@ export default function Generators(
             };
           }),
       };
-      return [
-        {
-          type: "add",
-          path: "src/modules/domain/{{{Name}}}/Entity.ts",
-          templateFile: "scaffolding/domain/Entity.ts.hbs",
-          data,
-        },
-        {
-          type: "add",
-          path: "src/modules/domain/{{{Name}}}/Identifier.ts",
-          templateFile: "scaffolding/domain/Identifier.ts.hbs",
-          data,
-        },
-        {
-          type: "add",
-          path: "src/modules/domain/{{{Name}}}/IRepository.ts",
-          templateFile: "scaffolding/domain/IRepository.ts.hbs",
-          data,
-        },
-        {
-          type: "add",
-          path: "src/modules/infra/prisma/{{{Name}}}/Repository.ts",
-          templateFile: "scaffolding/domain/Repository.ts.hbs",
-          data,
-        },
-        {
-          type: "add",
-          path: "src/modules/domain/{{{Name}}}/Exception.ts",
-          templateFile: "scaffolding/domain/DomainException.ts.hbs",
-          data,
-        },
-        {
-          type: "add",
-          path: "src/modules/application/{{{Name}}}/Exception.ts",
-          templateFile: "scaffolding/domain/ControllerException.ts.hbs",
-          data,
-        },
-        {
+
+      const actions = [];
+
+      if (ans._target.includes("Controller")) {
+        actions.push({
           type: "add",
           path: "src/modules/application/{{{Name}}}/Controller.ts",
           templateFile: "scaffolding/domain/Controller.ts.hbs",
           data,
-        },
-      ];
+        });
+      }
+      if (ans._target.includes("ControllerException")) {
+        actions.push({
+          type: "add",
+          path: "src/modules/application/{{{Name}}}/Exception.ts",
+          templateFile: "scaffolding/domain/ControllerException.ts.hbs",
+          data,
+        });
+      }
+      if (ans._target.includes("Repository")) {
+        actions.push({
+          type: "add",
+          path: "src/modules/infra/prisma/{{{Name}}}/Repository.ts",
+          templateFile: "scaffolding/domain/Repository.ts.hbs",
+          data,
+        });
+      }
+      if (ans._target.includes("RepositoryException")) {
+        actions.push({
+          type: "add",
+          path: "src/modules/infra/common/{{{Name}}}/Exception.ts",
+          templateFile: "scaffolding/domain/RepositoryException.ts.hbs",
+          data,
+        });
+      }
+      if (ans._target.includes("IRepository")) {
+        actions.push({
+          type: "add",
+          path: "src/modules/domain/{{{Name}}}/IRepository.ts",
+          templateFile: "scaffolding/domain/IRepository.ts.hbs",
+          data,
+        });
+      }
+      if (ans._target.includes("Entity")) {
+        actions.push({
+          type: "add",
+          path: "src/modules/domain/{{{Name}}}/Entity.ts",
+          templateFile: "scaffolding/domain/Entity.ts.hbs",
+          data,
+        });
+      }
+      if (ans._target.includes("Identifier")) {
+        actions.push({
+          type: "add",
+          path: "src/modules/domain/{{{Name}}}/Identifier.ts",
+          templateFile: "scaffolding/domain/Identifier.ts.hbs",
+          data,
+        });
+      }
+      if (ans._target.includes("DomainException")) {
+        actions.push({
+          type: "add",
+          path: "src/modules/domain/{{{Name}}}/Exception.ts",
+          templateFile: "scaffolding/domain/DomainException.ts.hbs",
+          data,
+        });
+      }
+
+      return actions;
     },
   });
 

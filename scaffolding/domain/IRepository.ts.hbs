@@ -4,7 +4,6 @@ import { {{{Name}}}Id } from "./Identifier";
 export interface I{{{Name}}}Repository {
   findById(id: {{{Name}}}Id): Promise<{{{Name}}} | undefined>;
   exist(id: {{{Name}}}Id): Promise<boolean>;
-  create({{{name}}}: {{{Name}}}): Promise<void>;
-  update({{{name}}}: {{{Name}}}): Promise<void>;
+  save({{{name}}}: {{{Name}}}): Promise<void>;
   delete(id: {{{Name}}}Id): Promise<void>;
 }

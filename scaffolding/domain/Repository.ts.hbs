@@ -34,27 +34,22 @@ export class {{{Name}}}Repository implements I{{{Name}}}Repository {
     return res != 0;
   }
 
-  async create({{{name}}}: {{{Name}}}): Promise<void> {
-    await this.prisma.{{{name}}}.create({
-      data: {
+  async save({{{name}}}: {{{Name}}}): Promise<void> {
+    await this.prisma.{{{name}}}.upsert({
+      create: {
         id: {{{name}}}.id.toString(),
 {{#each props}}
         {{{name}}}: {{{../name}}}{{#if isNullable}}?{{/if}}.{{{name}}},
 {{/each}}
       },
-    });
-  }
-
-  async update({{{name}}}: {{{Name}}}): Promise<void> {
-    await this.prisma.{{{name}}}.update({
-      data: {
+      update: {
 {{#each props}}
         {{{name}}}: {{{../name}}}{{#if isNullable}}?{{/if}}.{{{name}}},
 {{/each}}
       },
       where: {
         id: {{{name}}}.id.toString(),
-      },
+      }
     });
   }
 

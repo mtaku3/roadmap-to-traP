@@ -13,6 +13,8 @@ export const env = createEnv({
     JWT_SIGNING_SECRET: z.string(),
     JWT_ENCRYPTION_SECRET: z.string(),
     JWT_DECRYPTION_SECRET: z.string(),
+    TRAQ_AUTH_USERNAME: z.string(),
+    TRAQ_AUTH_PASSWORD: z.string(),
   },
   client: {},
   runtimeEnv: {
@@ -26,5 +28,7 @@ export const env = createEnv({
     JWT_SIGNING_SECRET: process.env.JWT_SIGNING_SECRET,
     JWT_ENCRYPTION_SECRET: process.env.JWT_ENCRYPTION_SECRET,
     JWT_DECRYPTION_SECRET: process.env.JWT_DECRYPTION_SECRET,
+    TRAQ_AUTH_USERNAME: process.env.TRAQ_AUTH_USERNAME,
+    TRAQ_AUTH_PASSWORD: process.env.TRAQ_AUTH_PASSWORD,
   },
 });
