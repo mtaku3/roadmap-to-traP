@@ -221,7 +221,7 @@ export class WorkshopRepository implements IWorkshopRepository {
         schoolYearId: new SchoolYearId(x.schoolYearId),
         courses,
         workshopsDependentOn: x.workshopsDependentOn.map(
-          (x) => new WorkshopId(x.id),
+          (x) => new WorkshopId(x.workshopDependentOnId),
         ),
       },
       new WorkshopId(x.id),

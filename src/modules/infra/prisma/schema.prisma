@@ -29,19 +29,13 @@ model SchoolYear {
 }
 
 model WorkshopDependency {
-  id                    String                 @id @default(uuid())
-  workshop              Workshop               @relation(name: "from", fields: [workshopId], references: [id])
+  id                    String   @id @default(uuid())
+  workshop              Workshop @relation(name: "from", fields: [workshopId], references: [id])
   workshopId            String
-  workshopDependentOn   Workshop               @relation(name: "to", fields: [workshopDependentOnId], references: [id])
+  workshopDependentOn   Workshop @relation(name: "to", fields: [workshopDependentOnId], references: [id])
   workshopDependentOnId String
-  dependencyType        WorkshopDependencyType
 
   @@unique([workshopId, workshopDependentOnId])
-}
-
-enum WorkshopDependencyType {
-  REQUIRED
-  RECOMMENDED
 }
 
 model Workshop {
