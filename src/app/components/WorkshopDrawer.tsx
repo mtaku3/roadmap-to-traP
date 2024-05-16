@@ -14,7 +14,6 @@ import {
   ActionIcon,
   Button,
   Checkbox,
-  Paper,
   Tooltip,
 } from "@mantine/core";
 import React from "react";
@@ -26,6 +25,7 @@ import { TbCalendarEvent, TbDoor, TbSearch, TbUserCheck } from "react-icons/tb";
 import { User } from "@/modules/domain/User/Entity";
 import Image from "next/image";
 import Link from "next/link";
+import { Course } from "@/modules/domain/Course/Entity";
 
 export function WorkshopDrawer({
   opened,
@@ -47,12 +47,6 @@ export function WorkshopDrawer({
   }
 
   const now = new Date();
-
-  function filterAndSortEvents(events: Event[]) {
-    return events
-      .filter((x) => userConfig.showOutdatedEvents || x.timeEnd > now)
-      .sort((x, y) => x.timeStart.getTime() - y.timeStart.getTime());
-  }
 
   return (
     <Drawer position="right" opened={opened} onClose={close}>
@@ -80,45 +74,10 @@ export function WorkshopDrawer({
           />
         </Stack>
         {workshop.courses.length === 1 && (
-          <Stack gap={1}>
-            {filterAndSortEvents(workshop.courses[0].events).map(
-              (event, idx) => (
-                <React.Fragment key={idx}>
-                  <EventCard event={event} />
-                  {workshop.courses[0].events.length - 1 !== idx && <Divider />}
-                </React.Fragment>
-              ),
-            )}
-            <EventNotFound
-              events={filterAndSortEvents(workshop.courses[0].events)}
-              showOutdatedEvents={userConfig.showOutdatedEvents}
-            />
-          </Stack>
+          <SingleCourse course={workshop.courses[0]} />
         )}
         {workshop.courses.length > 1 && (
-          <Accordion multiple={true}>
-            {workshop.courses
-              .sort((x, y) => x.order - y.order)
-              .map((course, idx) => (
-                <Accordion.Item key={idx} value={course.id.toString()}>
-                  <Accordion.Control>{course.name}</Accordion.Control>
-                  <Accordion.Panel>
-                    <Stack gap={1}>
-                      {filterAndSortEvents(course.events).map((event, idx) => (
-                        <React.Fragment key={idx}>
-                          <EventCard event={event} />
-                          {course.events.length - 1 !== idx && <Divider />}
-                        </React.Fragment>
-                      ))}
-                      <EventNotFound
-                        events={filterAndSortEvents(course.events)}
-                        showOutdatedEvents={userConfig.showOutdatedEvents}
-                      />
-                    </Stack>
-                  </Accordion.Panel>
-                </Accordion.Item>
-              ))}
-          </Accordion>
+          <MultiCoursesAccordion courses={workshop.courses} />
         )}
         {workshop.courses.length === 0 && (
           <EventNotFound
@@ -131,6 +90,70 @@ export function WorkshopDrawer({
   );
 }
 
+function filterAndSortEvents(events: Event[], showOutdatedEvents: boolean) {
+  const now = new Date();
+  return events
+    .filter((x) => showOutdatedEvents || x.timeEnd > now)
+    .sort((x, y) => x.timeStart.getTime() - y.timeStart.getTime());
+}
+
+function SingleCourse({ course }: { course: Course }) {
+  const [userConfig] = useAtom(userConfigAtom);
+  const events = filterAndSortEvents(
+    course.events,
+    userConfig.showOutdatedEvents,
+  );
+  return (
+    <Stack gap={1}>
+      {events.map((event, idx) => (
+        <React.Fragment key={idx}>
+          <EventCard event={event} />
+          {course.events.length - 1 !== idx && <Divider />}
+        </React.Fragment>
+      ))}
+      <EventNotFound
+        events={events}
+        showOutdatedEvents={userConfig.showOutdatedEvents}
+      />
+    </Stack>
+  );
+}
+
+function MultiCoursesAccordion({ courses }: { courses: Course[] }) {
+  const [userConfig] = useAtom(userConfigAtom);
+  return (
+    <Accordion multiple={true}>
+      {courses
+        .sort((x, y) => x.order - y.order)
+        .map((course, idx) => {
+          const events = filterAndSortEvents(
+            course.events,
+            userConfig.showOutdatedEvents,
+          );
+          return (
+            <Accordion.Item key={idx} value={course.id.toString()}>
+              <Accordion.Control>{course.name}</Accordion.Control>
+              <Accordion.Panel>
+                <Stack gap={1}>
+                  {events.map((event, idx) => (
+                    <React.Fragment key={idx}>
+                      <EventCard event={event} />
+                      {course.events.length - 1 !== idx && <Divider />}
+                    </React.Fragment>
+                  ))}
+                  <EventNotFound
+                    events={events}
+                    showOutdatedEvents={userConfig.showOutdatedEvents}
+                  />
+                </Stack>
+              </Accordion.Panel>
+            </Accordion.Item>
+          );
+        })}
+    </Accordion>
+  );
+}
+
 function EventNotFound({
   events,
   showOutdatedEvents,
@@ -138,7 +161,7 @@ function EventNotFound({
   events: Event[];
   showOutdatedEvents: boolean;
 }) {
-  if (events.length > 1) {
+  if (events.length > 0) {
     return;
   }
 
