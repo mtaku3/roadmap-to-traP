@@ -42,7 +42,7 @@ export function Header() {
   return (
     <Group py={16} h="100%">
       <Text component={Link} href="/" size="lg" fw={700}>
-        Roadmap to traP
+        RoadmaP
       </Text>
       <Group ml="auto" pos="relative">
         <LoadingOverlay visible={isPending} loaderProps={{ type: "dots" }} />
