@@ -1,5 +1,6 @@
 import { di } from "@/modules/di";
 import { SchoolYearId } from "@/modules/domain/SchoolYear/Identifier";
+import { WorkshopId } from "@/modules/domain/Workshop/Identifier";
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
 import { z } from "zod";
 
@@ -21,5 +22,17 @@ export const workshopRouter = createTRPCRouter({
         cursor,
       });
       return res;
+    }),
+  findById: publicProcedure
+    .input(
+      z.object({
+        id: z.string(),
+      }),
+    )
+    .query(async ({ input }) => {
+      const res = await di.cradle.workshopController.findById({
+        id: new WorkshopId(input.id),
+      });
+      return res.workshop;
     }),
 });

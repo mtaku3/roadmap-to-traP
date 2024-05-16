@@ -10,7 +10,7 @@ import {
 import { createTRPCReact as createTanstackQueryTRPCReact } from "@trpc/react-query";
 import { type inferRouterInputs, type inferRouterOutputs } from "@trpc/server";
 import { useState } from "react";
-import SuperJSON from "superjson";
+import SuperJSON from "../server/api/superjson";
 
 import { type AppRouter } from "@/server/api/root";
 

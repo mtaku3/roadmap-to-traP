@@ -28,7 +28,10 @@ export default function Home() {
       {data?.pages
         .map(({ workshops }) =>
           workshops.map((workshop) => (
-            <Grid.Col key={workshop.id.toString()} span={4}>
+            <Grid.Col
+              key={workshop.id.toString()}
+              span={{ base: 12, xs: 6, sm: 4 }}
+            >
               <WorkshopCard workshop={workshop} />
             </Grid.Col>
           )),

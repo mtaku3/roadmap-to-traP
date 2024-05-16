@@ -7,7 +7,7 @@
  * need to use are documented accordingly near the end.
  */
 import { TRPCError, initTRPC } from "@trpc/server";
-import superjson from "superjson";
+import superjson from "./superjson";
 import { ZodError } from "zod";
 import { env } from "@/env";
 import { authenticate } from "@/app/api/v1/oauth/auth";

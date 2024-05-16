@@ -2,17 +2,25 @@
 
 import "./globals.css";
 import "@mantine/core/styles.css";
+import "reactflow/dist/style.css";
 import {
+  CSSVariablesResolver,
   ColorSchemeScript,
   Container,
   Divider,
-  Group,
   MantineProvider,
-  Stack,
 } from "@mantine/core";
 import { Header } from "./components/Header";
 import { TRPCReactProvider } from "@/trpc/react";
 import { Provider as JotaiProvider } from "jotai";
+
+const resolver: CSSVariablesResolver = (theme) => ({
+  variables: {
+    "--header-height": "96px",
+  },
+  light: {},
+  dark: {},
+});
 
 export default function RootLayout({
   children,
@@ -27,15 +35,13 @@ export default function RootLayout({
       <body>
         <JotaiProvider>
           <TRPCReactProvider>
-            <MantineProvider>
-              <Container size="md" mih="100vh">
-                <Stack>
-                  <Stack gap={0}>
-                    <Header />
-                    <Divider />
-                  </Stack>
-                  {children}
-                </Stack>
+            <MantineProvider cssVariablesResolver={resolver}>
+              <Container size="md" w="100%">
+                <div style={{ height: "72px", marginBottom: "24px" }}>
+                  <Header />
+                  <Divider />
+                </div>
+                {children}
               </Container>
             </MantineProvider>
           </TRPCReactProvider>

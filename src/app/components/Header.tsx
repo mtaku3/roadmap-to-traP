@@ -39,22 +39,20 @@ export function Header() {
   const isPending = isAppConfigPending || isSchoolYearsPending || isUserPending;
 
   return (
-    <>
-      <Group py={16}>
-        <Text size="lg" fw={700}>
-          Roadmap to traP
-        </Text>
-        <Group ml="auto" pos="relative">
-          <LoadingOverlay visible={isPending} loaderProps={{ type: "dots" }} />
-          <SchoolYearSelection
-            appConfig={appConfig}
-            setAppConfig={setAppConfig}
-            schoolYears={schoolYears}
-          />
-          <UserSection user={user} />
-        </Group>
+    <Group py={16} h="100%">
+      <Text size="lg" fw={700}>
+        Roadmap to traP
+      </Text>
+      <Group ml="auto" pos="relative">
+        <LoadingOverlay visible={isPending} loaderProps={{ type: "dots" }} />
+        <SchoolYearSelection
+          appConfig={appConfig}
+          setAppConfig={setAppConfig}
+          schoolYears={schoolYears}
+        />
+        <UserSection user={user} />
       </Group>
-    </>
+    </Group>
   );
 }
 

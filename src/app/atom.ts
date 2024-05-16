@@ -30,3 +30,18 @@ export const appConfigAtom = atom(
     set(appConfigPrimitiveAtom, { state: "hasData", data });
   },
 );
+
+export type UserConfig = {
+  showOutdatedEvents: boolean;
+  showEventDescription: boolean;
+};
+const userConfigPritimiveAtom = atom({
+  showOutdatedEvents: false,
+  showEventDescription: false,
+});
+export const userConfigAtom = atom(
+  (get) => get(userConfigPritimiveAtom),
+  (get, set, data: UserConfig) => {
+    set(userConfigPritimiveAtom, data);
+  },
+);

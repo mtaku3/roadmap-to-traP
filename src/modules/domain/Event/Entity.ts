@@ -1,6 +1,7 @@
 import { Entity } from "@/modules/core/Entity";
 import { EventId } from "./Identifier";
 import { EventAttendance } from "../EventAttendance/Entity";
+import { UserId } from "../User/Identifier";
 
 export interface EventProps {
   name: string;
@@ -58,5 +59,11 @@ export class Event extends Entity<EventProps, EventId> {
     return this._props.attendees != null
       ? [...this._props.attendees]
       : this._props.attendees;
+  }
+
+  getAttendanceByUserId(userId: UserId): EventAttendance | undefined {
+    return this.attendees.find((attendance) =>
+      attendance.userId.equalsTo(userId),
+    );
   }
 }
