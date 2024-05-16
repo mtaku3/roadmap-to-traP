@@ -223,7 +223,7 @@ export class WorkshopRepository implements IWorkshopRepository {
         workshopsDependentOn: x.workshopsDependentOn.map(
           (x) => new WorkshopId(x.workshopDependentOnId),
         ),
-        userId: x.userId != null ? new UserId(x.userId) : undefined,
+        userId: new UserId(x.userId),
       },
       new WorkshopId(x.id),
     );

@@ -48,8 +48,8 @@ model Workshop {
   workshopsReliedOn    WorkshopDependency[] @relation(name: "to")
   schoolYear           SchoolYear           @relation(fields: [schoolYearId], references: [id])
   schoolYearId         String
-  user                 User?                @relation(fields: [userId], references: [id])
-  userId               String?
+  user                 User                 @relation(fields: [userId], references: [id])
+  userId               String
 }
 
 model Course {

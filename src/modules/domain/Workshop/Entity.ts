@@ -10,7 +10,7 @@ export interface WorkshopProps {
   courses: Course[];
   workshopsDependentOn: WorkshopId[];
   schoolYearId: SchoolYearId;
-  userId?: UserId;
+  userId: UserId;
 }
 
 export class Workshop extends AggregateRoot<WorkshopProps, WorkshopId> {
@@ -20,7 +20,7 @@ export class Workshop extends AggregateRoot<WorkshopProps, WorkshopId> {
     courses: Course[],
     workshopsDependentOn: WorkshopId[],
     schoolYearId: SchoolYearId,
-    userId?: UserId,
+    userId: UserId,
   ) {
     return new Workshop(
       {
@@ -59,7 +59,7 @@ export class Workshop extends AggregateRoot<WorkshopProps, WorkshopId> {
     return this._props.schoolYearId;
   }
 
-  get UserId(): UserId | undefined {
+  get UserId(): UserId {
     return this._props.userId;
   }
 
