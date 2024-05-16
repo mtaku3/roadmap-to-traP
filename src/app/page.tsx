@@ -24,7 +24,7 @@ export default function Home() {
     );
 
   return (
-    <Grid>
+    <Grid align="stretch">
       {data?.pages
         .map(({ workshops }) =>
           workshops.map((workshop) => (
