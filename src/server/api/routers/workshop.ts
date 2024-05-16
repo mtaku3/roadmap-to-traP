@@ -1,7 +1,11 @@
 import { di } from "@/modules/di";
 import { SchoolYearId } from "@/modules/domain/SchoolYear/Identifier";
 import { WorkshopId } from "@/modules/domain/Workshop/Identifier";
-import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
+import {
+  createTRPCRouter,
+  protectedProcedure,
+  publicProcedure,
+} from "@/server/api/trpc";
 import { z } from "zod";
 
 export const workshopRouter = createTRPCRouter({
@@ -34,5 +38,29 @@ export const workshopRouter = createTRPCRouter({
         id: new WorkshopId(input.id),
       });
       return res.workshop;
+    }),
+  create: protectedProcedure
+    .input(
+      z.object({
+        name: z.string(),
+        description: z.string(),
+        courses: z.array(
+          z.object({
+            name: z.string(),
+            description: z.string(),
+            order: z.number().int(),
+            events: z.array(z.string()),
+          }),
+        ),
+        workshopsDependentOn: z.array(z.string()),
+        schoolYearId: z.string(),
+      }),
+    )
+    .mutation(async ({ input, ctx }) => {
+      const user = ctx.user;
+      await di.cradle.workshopController.create({
+        ...input,
+        userId: user.id.toString(),
+      });
     }),
 });
