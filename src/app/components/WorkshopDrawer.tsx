@@ -15,6 +15,7 @@ import {
   Button,
   Checkbox,
   Paper,
+  Tooltip,
 } from "@mantine/core";
 import React from "react";
 import "moment/locale/ja";
@@ -190,14 +191,16 @@ function EventCard({ event }: { event: Event }) {
           </ThemeIcon>
           <Group gap={1}>
             <Text size="sm">{event.place}</Text>
-            <ActionIcon
-              component={Link}
-              href={`https://www.ssc.titech.ac.jp/amap/?s=${event.place}`}
-              target="_blank"
-              variant="white"
-            >
-              <TbSearch />
-            </ActionIcon>
+            <Tooltip label="場所を確認する">
+              <ActionIcon
+                component={Link}
+                href={`https://www.ssc.titech.ac.jp/amap/?s=${event.place}`}
+                target="_blank"
+                variant="white"
+              >
+                <TbSearch />
+              </ActionIcon>
+            </Tooltip>
           </Group>
         </Group>
         {(isPending || user != null) && (
