@@ -16,6 +16,7 @@ import { useAtom } from "jotai";
 import { AppConfig, appConfigAtom, userAtom } from "../atom";
 import { api } from "@/trpc/react";
 import { SchoolYear } from "@/modules/domain/SchoolYear/Entity";
+import Link from "next/link";
 
 export function Header() {
   const [_appConfig, _setAppConfig] = useAtom(appConfigAtom);
@@ -40,7 +41,7 @@ export function Header() {
 
   return (
     <Group py={16} h="100%">
-      <Text size="lg" fw={700}>
+      <Text component={Link} href="/" size="lg" fw={700}>
         Roadmap to traP
       </Text>
       <Group ml="auto" pos="relative">
