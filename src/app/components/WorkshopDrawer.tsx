@@ -16,7 +16,7 @@ import {
   Checkbox,
   Tooltip,
 } from "@mantine/core";
-import React from "react";
+import React, { useState } from "react";
 import "moment/locale/ja";
 import moment from "moment";
 import { useAtom } from "jotai";
@@ -26,6 +26,7 @@ import { User } from "@/modules/domain/User/Entity";
 import Image from "next/image";
 import Link from "next/link";
 import { Course } from "@/modules/domain/Course/Entity";
+import { useDisclosure } from "@mantine/hooks";
 
 export function WorkshopDrawer({
   opened,
@@ -121,36 +122,48 @@ function SingleCourse({ course }: { course: Course }) {
 
 function MultiCoursesAccordion({ courses }: { courses: Course[] }) {
   const [userConfig] = useAtom(userConfigAtom);
+  const [value, setValue] = useState<string[]>(
+    courses.map((x) => x.id.toString()),
+  );
+  const allOpened = value.length === courses.length;
+  const open = () => setValue(courses.map((x) => x.id.toString()));
+  const close = () => setValue([]);
+  const toggle = () => (allOpened ? close() : open());
   return (
-    <Accordion multiple={true}>
-      {courses
-        .sort((x, y) => x.order - y.order)
-        .map((course, idx) => {
-          const events = filterAndSortEvents(
-            course.events,
-            userConfig.showOutdatedEvents,
-          );
-          return (
-            <Accordion.Item key={idx} value={course.id.toString()}>
-              <Accordion.Control>{course.name}</Accordion.Control>
-              <Accordion.Panel>
-                <Stack gap={1}>
-                  {events.map((event, idx) => (
-                    <React.Fragment key={idx}>
-                      <EventCard event={event} />
-                      {course.events.length - 1 !== idx && <Divider />}
-                    </React.Fragment>
-                  ))}
-                  <EventNotFound
-                    events={events}
-                    showOutdatedEvents={userConfig.showOutdatedEvents}
-                  />
-                </Stack>
-              </Accordion.Panel>
-            </Accordion.Item>
-          );
-        })}
-    </Accordion>
+    <Stack gap="xs">
+      <Button variant="white" onClick={() => toggle()}>
+        {allOpened ? "全て閉じる" : "全て開く"}
+      </Button>
+      <Accordion multiple={true} value={value} onChange={(x) => setValue(x)}>
+        {courses
+          .sort((x, y) => x.order - y.order)
+          .map((course, idx) => {
+            const events = filterAndSortEvents(
+              course.events,
+              userConfig.showOutdatedEvents,
+            );
+            return (
+              <Accordion.Item key={idx} value={course.id.toString()}>
+                <Accordion.Control>{course.name}</Accordion.Control>
+                <Accordion.Panel>
+                  <Stack gap={1}>
+                    {events.map((event, idx) => (
+                      <React.Fragment key={idx}>
+                        <EventCard event={event} />
+                        {course.events.length - 1 !== idx && <Divider />}
+                      </React.Fragment>
+                    ))}
+                    <EventNotFound
+                      events={events}
+                      showOutdatedEvents={userConfig.showOutdatedEvents}
+                    />
+                  </Stack>
+                </Accordion.Panel>
+              </Accordion.Item>
+            );
+          })}
+      </Accordion>
+    </Stack>
   );
 }
 
