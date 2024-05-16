@@ -2,6 +2,7 @@ import { AggregateRoot } from "@/modules/core/AggregateRoot";
 import { WorkshopId } from "./Identifier";
 import { Course } from "../Course/Entity";
 import { SchoolYearId } from "../SchoolYear/Identifier";
+import { UserId } from "../User/Identifier";
 
 export interface WorkshopProps {
   name: string;
@@ -9,6 +10,7 @@ export interface WorkshopProps {
   courses: Course[];
   workshopsDependentOn: WorkshopId[];
   schoolYearId: SchoolYearId;
+  userId?: UserId;
 }
 
 export class Workshop extends AggregateRoot<WorkshopProps, WorkshopId> {
@@ -18,6 +20,7 @@ export class Workshop extends AggregateRoot<WorkshopProps, WorkshopId> {
     courses: Course[],
     workshopsDependentOn: WorkshopId[],
     schoolYearId: SchoolYearId,
+    userId?: UserId,
   ) {
     return new Workshop(
       {
@@ -26,6 +29,7 @@ export class Workshop extends AggregateRoot<WorkshopProps, WorkshopId> {
         courses,
         workshopsDependentOn,
         schoolYearId,
+        userId,
       },
       WorkshopId.next(),
     );
@@ -53,6 +57,10 @@ export class Workshop extends AggregateRoot<WorkshopProps, WorkshopId> {
 
   get schoolYearId(): SchoolYearId {
     return this._props.schoolYearId;
+  }
+
+  get UserId(): UserId | undefined {
+    return this._props.userId;
   }
 
   setName(name: string) {
