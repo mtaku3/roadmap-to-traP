@@ -150,5 +150,5 @@ export async function GET(req: NextRequest) {
     secure: env.NODE_ENV === "production",
   });
 
-  return NextResponse.redirect(new URL("/", req.url));
+  return NextResponse.redirect(new URL("/", env.NEXT_PUBLIC_URL));
 }

@@ -27,6 +27,7 @@ services:
           target: /home/node/app/src/modules/infra/prisma/schema.prisma
     environment:
       DATABASE_URL: mysql://root:password@db:3306/dev
+      NEXT_PUBLIC_URL: http://localhost:3000
   db:
     image: mariadb
     volumes:
