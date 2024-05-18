@@ -29,10 +29,10 @@ export const createTRPCContext = async ({
   req,
   headers,
 }: {
-  req: NextRequest;
+  req?: NextRequest;
   headers: Headers;
 }) => {
-  const jwt = req.cookies.get(env.APP_AUTH_SESSION_COOKIE_NAME)?.value;
+  const jwt = req?.cookies.get(env.APP_AUTH_SESSION_COOKIE_NAME)?.value;
   const user = jwt != null ? await authenticate(jwt) : undefined;
 
   return {

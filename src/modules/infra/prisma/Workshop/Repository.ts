@@ -4,7 +4,7 @@ import { Workshop } from "@/modules/domain/Workshop/Entity";
 import { WorkshopId } from "@/modules/domain/Workshop/Identifier";
 import { Course } from "@/modules/domain/Course/Entity";
 import { CourseId } from "@/modules/domain/Course/Identifier";
-import { EventsApiFactory } from "@/modules/external/knoq";
+import type { EventsApiFactory } from "@/modules/external/knoq/api/events-api";
 import { Event } from "@/modules/domain/Event/Entity";
 import { EventId } from "@/modules/domain/Event/Identifier";
 import { SchoolYearId } from "@/modules/domain/SchoolYear/Identifier";
