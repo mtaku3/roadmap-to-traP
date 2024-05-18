@@ -23,8 +23,9 @@ RUN apt-get update && apt-get install -y bash curl \
     && rm -rf /var/lib/apt/lists/*
 
 ENV NODE_ENV production
+ENV PORT 80
 
 RUN npm install \
     && npm run build
 
-CMD ["infisical", "run", "--", "npm", "run", "start"]
+CMD ["infisical", "run", "--projectId", "596480d8-07e7-4a4a-8309-1ed846a77923", "--", "npm", "run", "start"]
