@@ -9,6 +9,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:compile": "next build --experimental-build-mode compile",
+    "build:generate": "next build --experimental-build-mode generate",
     "start": "next start",
     "lint": "next lint",
     "og:traq": "openapi-generator-cli generate -g typescript-axios -i https://raw.githubusercontent.com/traPtitech/traQ/master/docs/v3-api.yaml -o ./src/modules/external/traq/ --api-package api --model-package model --additional-properties withSeparateModelsAndApi=true && rm ./src/modules/external/traq/api.ts ./src/modules/external/traq/index.ts",

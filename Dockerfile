@@ -30,6 +30,7 @@ COPY --chown=node:node . /home/node/app
 ENTRYPOINT ["/home/node/app/docker-entrypoint.prod.sh"]
 
 RUN npm install \
-    && npx prisma generate
+    && npx prisma generate \
+    && npm run build:compile
 
 CMD ["npm", "run", "start"]
