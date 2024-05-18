@@ -2,6 +2,7 @@
 
 import { api } from "@/trpc/react";
 import {
+  Alert,
   Button,
   Divider,
   Grid,
@@ -42,6 +43,14 @@ export default function Home() {
     <>
       <title>RoadmaP</title>
       <Stack gap="xs">
+        <Group>
+          <Alert w="100%">
+            遊び場では任意の講習会を選択してグラフを構築することができます。後々、グラフを保存して共有する機能も実装予定です。
+          </Alert>
+          <Button component={Link} href="/playground" variant="light" fullWidth>
+            グラフで遊ぶ
+          </Button>
+        </Group>
         <Group>
           <Title order={1} size="h3">
             講習会

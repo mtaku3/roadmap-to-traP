@@ -53,15 +53,16 @@ export class WorkshopRepository implements IWorkshopRepository {
     ops.push(
       this.prisma.event.deleteMany({
         where: {
-          AND: workshop.courses
-            .map((course) =>
-              course.events.map((event) => ({
-                NOT: {
-                  id: event.id.toString(),
-                },
-              })),
-            )
-            .flat(),
+          id: {
+            notIn: workshop.courses
+              .map((course) =>
+                course.events.map((event) => event.id.toString()),
+              )
+              .flat(),
+          },
+          courseId: {
+            in: workshop.courses.map((course) => course.id.toString()),
+          },
         },
       }),
     );
@@ -81,22 +82,18 @@ export class WorkshopRepository implements IWorkshopRepository {
           schoolYearId: workshop.schoolYearId.toString(),
           courses: {
             deleteMany: {
-              AND: workshop.courses.map((course) => {
-                return {
-                  NOT: {
-                    id: course.id.toString(),
-                  },
-                };
-              }),
+              id: {
+                notIn: workshop.courses.map((course) => course.id.toString()),
+              },
+              workshopId: workshop.id.toString(),
             },
           },
           workshopsDependentOn: {
             deleteMany: {
-              AND: workshop.workshopsDependentOn.map((workshopDependentOn) => ({
-                NOT: {
-                  workshopDependentOnId: workshopDependentOn.toString(),
-                },
-              })),
+              workshopDependentOnId: {
+                notIn: workshop.workshopsDependentOn.map((x) => x.toString()),
+              },
+              workshopId: workshop.id.toString(),
             },
           },
         },

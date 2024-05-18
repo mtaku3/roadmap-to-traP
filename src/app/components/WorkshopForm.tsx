@@ -46,6 +46,8 @@ import React from "react";
 import { Workshop } from "@/modules/domain/Workshop/Entity";
 import { BlurredOverlay } from "./BlurredOverlay";
 import { useRouter } from "next/navigation";
+import { CardMultiSelect } from "./CardMultiSelect";
+import { WorkshopMultiSelect } from "./WorkshopMultiSelect";
 
 export function WorkshopUpdateForm({
   defaultValue,
@@ -66,13 +68,15 @@ export function WorkshopUpdateForm({
       id: defaultValue.id.toString(),
       name: defaultValue.name,
       description: defaultValue.description,
-      courses: defaultValue.courses.map((x) => ({
-        id: x.id.toString(),
-        name: x.name,
-        description: x.description,
-        order: x.order,
-        events: x.events.map((x) => x.id.toString()),
-      })),
+      courses: defaultValue.courses
+        .sort((x, y) => x.order - y.order)
+        .map((x) => ({
+          id: x.id.toString(),
+          name: x.name,
+          description: x.description,
+          order: x.order,
+          events: x.events.map((x) => x.id.toString()),
+        })),
       workshopsDependentOn: defaultValue.workshopsDependentOn.map((x) =>
         x.toString(),
       ),
@@ -186,6 +190,7 @@ export function WorkshopUpdateForm({
             </Button>
           </Group>
           <Divider />
+          <Alert>コースはドラッグして並べ替えられます</Alert>
           {courses.map((course, idx) =>
             renderCourseCard(
               course.id,
@@ -216,7 +221,7 @@ export function WorkshopUpdateForm({
           )}
         />
         <Button type="submit" w="100%">
-          登録
+          更新する
         </Button>
       </Stack>
     </form>
@@ -361,6 +366,7 @@ export function WorkshopCreateForm() {
             </Button>
           </Group>
           <Divider />
+          <Alert>コースはドラッグして並べ替えられます</Alert>
           {courses.map((course, idx) =>
             renderCourseCard(
               course.id,
@@ -391,7 +397,7 @@ export function WorkshopCreateForm() {
           )}
         />
         <Button type="submit" w="100%">
-          登録
+          登録する
         </Button>
       </Stack>
     </form>
@@ -428,170 +434,6 @@ function EventCard({ event }: { event: KnoqEvent }) {
           <Text size="sm">{event.place}</Text>
         </Group>
       </Group>
-    </Stack>
-  );
-}
-
-function CardMultiSelect<T>({
-  options,
-  getId,
-  value,
-  onChange,
-  filterOnSearch,
-  renderCard,
-  placeholder,
-}: {
-  options: T[];
-  getId: (option: T) => string;
-  value: string[];
-  onChange: (value: string[]) => void;
-  filterOnSearch: (query: string) => T[];
-  renderCard: (option: T) => React.ReactNode;
-  placeholder?: string;
-}) {
-  const [search, setSearch] = useState("");
-  const [_value, setValue] = useUncontrolled({
-    value,
-    finalValue: [],
-    onChange,
-  });
-  const combobox = useCombobox({
-    onDropdownClose: () => {
-      setSearch("");
-    },
-  });
-  const memoizedFilterOnSearch = useCallback(filterOnSearch, [filterOnSearch]);
-  const memoizedRenderCard = useCallback(renderCard, [renderCard]);
-
-  const filteredOptions = memoizedFilterOnSearch(search);
-  const selectedOptions = options.filter((x) => _value.includes(getId(x)));
-
-  return (
-    <Stack>
-      <Combobox store={combobox}>
-        <Combobox.Target>
-          <InputBase
-            value={search}
-            onChange={(e) => {
-              combobox.openDropdown();
-              combobox.updateSelectedOptionIndex();
-              setSearch(e.currentTarget.value);
-            }}
-            onClick={() => combobox.openDropdown()}
-            onFocus={() => combobox.openDropdown()}
-            onBlur={() => combobox.closeDropdown()}
-            placeholder={placeholder}
-          />
-        </Combobox.Target>
-
-        <Combobox.Dropdown>
-          <Combobox.Options>
-            {filteredOptions.length > 0 ? (
-              <ScrollArea.Autosize type="scroll" mah={400}>
-                {filteredOptions.map((option, idx) => (
-                  <Combobox.Option
-                    key={idx}
-                    value={getId(option)}
-                    onClick={() =>
-                      setValue(
-                        _value.includes(getId(option))
-                          ? _value.filter((x) => x !== getId(option))
-                          : [..._value, getId(option)],
-                      )
-                    }
-                  >
-                    <Group>
-                      {_value.includes(getId(option)) && (
-                        <CheckIcon className="shrink-0 opacity-40 w-[0.8em] min-w-[0.8em] h-[0.8em]" />
-                      )}
-                      {memoizedRenderCard(option)}
-                    </Group>
-                  </Combobox.Option>
-                ))}
-              </ScrollArea.Autosize>
-            ) : (
-              <Combobox.Empty>見つかりませんでした</Combobox.Empty>
-            )}
-          </Combobox.Options>
-        </Combobox.Dropdown>
-      </Combobox>
-      <Stack pos="relative">
-        {combobox.dropdownOpened && <CardMultiSelectOverlay />}
-        {selectedOptions.map((option, idx) => (
-          <React.Fragment key={getId(option)}>
-            <Group>
-              {memoizedRenderCard(option)}
-              <ActionIcon
-                ml="auto"
-                color="red"
-                onClick={() =>
-                  setValue(_value.filter((x) => x !== getId(option)))
-                }
-              >
-                <TbTrash />
-              </ActionIcon>
-            </Group>
-            {idx < selectedOptions.length - 1 && <Divider />}
-          </React.Fragment>
-        ))}
-      </Stack>
-    </Stack>
-  );
-}
-
-function WorkshopCard({ workshop }: { workshop: Workshop }) {
-  return (
-    <Stack p={4} gap="sm" className="flex-1">
-      <Text fw={500} size="md">
-        {workshop.name}
-      </Text>
-      <Text c="dimmed">{workshop.description}</Text>
-    </Stack>
-  );
-}
-
-function WorkshopMultiSelect({
-  value,
-  onChange,
-}: {
-  value: string[];
-  onChange: (value: string[]) => void;
-}) {
-  const [_appConfig, _setAppConfig] = useAtom(appConfigAtom);
-  const isAppConfigPending = _appConfig.state === "loading";
-  const appConfig =
-    _appConfig.state === "hasData" ? _appConfig.data : undefined;
-  const { data: workshops, isPending: isWorkshopsPending } =
-    api.tq.workshop.getAll.useQuery(
-      { schoolYearId: appConfig?.schoolYear.id.toString() ?? "" },
-      {
-        enabled: !isAppConfigPending && appConfig != null,
-      },
-    );
-
-  function getFilteredWorkshops(query: string) {
-    return workshops?.filter((x) => x.name.includes(query)) ?? [];
-  }
-
-  const renderCard = (workshop: Workshop) => (
-    <WorkshopCard workshop={workshop} />
-  );
-
-  return (
-    <Stack pos="relative">
-      <LoadingOverlay
-        visible={isWorkshopsPending}
-        loaderProps={{ type: "dots" }}
-      />
-      <CardMultiSelect
-        options={workshops ?? []}
-        getId={(x) => x.id.toString()}
-        value={value}
-        filterOnSearch={getFilteredWorkshops}
-        onChange={onChange}
-        renderCard={renderCard}
-        placeholder="依存する講習会を追加"
-      />
     </Stack>
   );
 }
@@ -656,22 +498,6 @@ function EventMultiSelect({
       renderCard={renderEvent}
       placeholder="イベントを追加"
     />
-  );
-}
-
-function CardMultiSelectOverlay() {
-  const theme = useMantineTheme();
-
-  return (
-    <>
-      <Overlay darkHidden center backgroundOpacity={0.75} color={theme.white} />
-      <Overlay
-        lightHidden
-        center
-        backgroundOpacity={0.75}
-        color={theme.colors.dark[5]}
-      />
-    </>
   );
 }
 

@@ -45,7 +45,15 @@ const traqConfig = new TraqConfiguration({
 });
 
 container.register({
-  prisma: asFunction(() => new PrismaClient()).singleton(),
+  prisma: asFunction(
+    () =>
+      new PrismaClient({
+        log:
+          env.NODE_ENV === "production"
+            ? ["warn", "error"]
+            : ["query", "info", "warn", "error"],
+      }),
+  ).singleton(),
   traqMeApi: asFunction(() =>
     MeApiFactory(traqConfig, undefined, traqAxios),
   ).singleton(),
