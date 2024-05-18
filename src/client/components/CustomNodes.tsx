@@ -1,5 +1,3 @@
-"use client";
-
 import { Workshop } from "@/modules/domain/Workshop/Entity";
 import { Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";

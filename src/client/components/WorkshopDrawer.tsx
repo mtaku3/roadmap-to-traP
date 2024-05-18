@@ -1,5 +1,3 @@
-"use client";
-
 import { Workshop } from "@/modules/domain/Workshop/Entity";
 import { Event } from "@/modules/domain/Event/Entity";
 import {

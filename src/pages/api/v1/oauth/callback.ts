@@ -1,61 +1,47 @@
 import { env } from "@/env";
-import { cookies } from "next/headers";
-import { NextRequest, NextResponse } from "next/server";
-import { decryptAndVerify, signAndEncrypt } from "../jose";
+import { decryptAndVerify, signAndEncrypt } from "@/server/jose";
 import axios from "axios";
 import { di } from "@/modules/di";
 import { UserId } from "@/modules/domain/User/Identifier";
-import { OAuthSessionJWTPayload } from "../auth";
+import { OAuthSessionJWTPayload } from "@/server/auth";
 import { User } from "@/modules/domain/User/Entity";
+import { NextApiRequest, NextApiResponse } from "next";
+import nookies from "nookies";
+import { createRouter } from "next-connect";
 
-export async function GET(req: NextRequest) {
-  const searchParams = req.nextUrl.searchParams;
-  const code = searchParams.get("code");
-  const state = searchParams.get("state");
+export const router = createRouter<NextApiRequest, NextApiResponse>();
+
+router.get(async (req, res) => {
+  const ctx = { req, res };
+
+  const code = req.query.code as string | undefined;
+  const state = req.query.state as string | undefined;
   if (code == null || state == null) {
-    return NextResponse.json(
-      {
-        message: searchParams.get("error"),
-      },
-      {
-        status: 500,
-      },
-    );
+    return res.status(500).json({
+      message: req.query.error,
+    });
   }
 
-  const oauthJwt = cookies().get(env.OAUTH_SESSION_COOKIE_NAME)?.value;
+  const oauthJwt = nookies.get(ctx)[env.OAUTH_SESSION_COOKIE_NAME];
   if (oauthJwt == null) {
-    return NextResponse.json(
-      {
-        message: "Session for authorization CSRF not found",
-      },
-      {
-        status: 400,
-      },
-    );
+    return res.status(400).json({
+      message: "Session for authorization CSRF not found",
+    });
   }
-  cookies().delete(env.OAUTH_SESSION_COOKIE_NAME);
+  nookies.destroy(ctx, env.OAUTH_SESSION_COOKIE_NAME);
 
   let payload;
   try {
     payload = await decryptAndVerify<OAuthSessionJWTPayload>(oauthJwt);
   } catch (e) {
-    return NextResponse.json(
-      {
-        message: "Invalid oauth session",
-      },
-      { status: 400 },
-    );
+    return res.status(400).json({
+      message: "Invalid oauth session",
+    });
   }
   if (payload.state !== state) {
-    return NextResponse.json(
-      {
-        message: "This is not our authorization request",
-      },
-      {
-        status: 400,
-      },
-    );
+    return res.status(400).json({
+      message: "This is not our authorization request",
+    });
   }
 
   let tokenResponse;
@@ -80,10 +66,9 @@ export async function GET(req: NextRequest) {
       },
     );
   } catch (e) {
-    return NextResponse.json(
-      { message: "Failed to retrieve token from oauth provider" },
-      { status: 500 },
-    );
+    return res
+      .status(500)
+      .json({ message: "Failed to retrieve token from oauth provider" });
   }
 
   let userInfoResponse;
@@ -92,13 +77,10 @@ export async function GET(req: NextRequest) {
       headers: { Authorization: `Bearer ${tokenResponse.data.access_token}` },
     });
   } catch (e) {
-    return NextResponse.json(
-      {
-        message:
-          "Retrieved access token does not have enough permission to get user info",
-      },
-      { status: 401 },
-    );
+    return res.status(401).json({
+      message:
+        "Retrieved access token does not have enough permission to get user info",
+    });
   }
 
   let user;
@@ -124,12 +106,9 @@ export async function GET(req: NextRequest) {
       await di.cradle.userRepository.update(user);
     }
   } catch (e) {
-    return NextResponse.json(
-      {
-        message: "Failed to create or update user",
-      },
-      { status: 500 },
-    );
+    return res.status(500).json({
+      message: "Failed to create or update user",
+    });
   }
 
   const tokenResponseTime = new Date(tokenResponse.headers["date"]);
@@ -143,12 +122,15 @@ export async function GET(req: NextRequest) {
     },
     expiresAt,
   );
-  cookies().set(env.APP_AUTH_SESSION_COOKIE_NAME, appAuthJwt, {
+  nookies.set(ctx, env.APP_AUTH_SESSION_COOKIE_NAME, appAuthJwt, {
     expires: expiresAt,
     sameSite: "strict",
+    path: "/",
     httpOnly: true,
     secure: env.NODE_ENV === "production",
   });
 
-  return NextResponse.redirect(new URL("/", req.url));
-}
+  return res.redirect("/");
+});
+
+export default router.handler();

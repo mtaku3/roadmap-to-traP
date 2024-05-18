@@ -1,10 +1,10 @@
 import { env } from "@/env";
 import { di } from "@/modules/di";
 import { User } from "@/modules/domain/User/Entity";
-import { cookies } from "next/headers";
-import { NextRequest, NextResponse } from "next/server";
 import { decryptAndVerify } from "./jose";
 import { UserId } from "@/modules/domain/User/Identifier";
+import { NextApiRequest, NextApiResponse } from "next";
+import nookies from "nookies";
 
 export interface OAuthSessionJWTPayload {
   code_verifier: string;
@@ -22,7 +22,16 @@ export interface NextContext {
   session?: AppAuthSessionJWTPayload;
 }
 
-export async function authenticate(jwt: string) {
+export async function authenticate(
+  req: NextApiRequest,
+  res: NextApiResponse,
+): Promise<NextContext> {
+  const ctx = { req, res };
+  const jwt = nookies.get(ctx)[env.APP_AUTH_SESSION_COOKIE_NAME];
+  if (jwt == null) {
+    return {};
+  }
+
   let payload;
   try {
     payload = await decryptAndVerify<AppAuthSessionJWTPayload>(jwt);
@@ -43,28 +52,7 @@ export async function authenticate(jwt: string) {
     throw new AuthMiddlewareException("Failed to find user by id");
   }
 
-  return user;
-}
-
-export function nextAuthMiddleware(
-  handler: (req: NextRequest, ctx: NextContext) => Promise<NextResponse>,
-) {
-  return async (req: NextRequest) => {
-    const appAuthJwt = cookies().get(env.APP_AUTH_SESSION_COOKIE_NAME)?.value;
-    if (appAuthJwt == null) {
-      return await handler(req, {});
-    } else {
-      let user;
-      try {
-        user = await authenticate(appAuthJwt);
-      } catch (e) {
-        let message = e instanceof Error ? e.message : undefined;
-        return NextResponse.json({ message }, { status: 500 });
-      }
-
-      return await handler(req, { user });
-    }
-  };
+  return { user, session: payload };
 }
 
 export class AuthMiddlewareException extends Error {}

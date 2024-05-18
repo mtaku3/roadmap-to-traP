@@ -1,13 +1,19 @@
-import { NextResponse } from "next/server";
 import { env } from "@/env";
 import { generators } from "openid-client";
-import { signAndEncrypt } from "../jose";
-import { cookies } from "next/headers";
-import { nextAuthMiddleware } from "../auth";
+import { signAndEncrypt } from "@/server/jose";
+import { authenticate } from "@/server/auth";
+import nookies from "nookies";
+import { createRouter } from "next-connect";
+import { NextApiRequest, NextApiResponse } from "next";
 
-export const GET = nextAuthMiddleware(async (req, ctx) => {
-  if (ctx.user != null) {
-    return NextResponse.redirect(new URL("/", req.url));
+const router = createRouter<NextApiRequest, NextApiResponse>();
+
+router.get(async (req, res) => {
+  const ctx = { req, res };
+  const authCtx = await authenticate(req, res);
+
+  if (authCtx.user != null) {
+    return res.redirect("/");
   }
 
   const verifier = generators.codeVerifier();
@@ -28,14 +34,11 @@ export const GET = nextAuthMiddleware(async (req, ctx) => {
       expiresAt,
     );
   } catch (e) {
-    return NextResponse.json(
-      {
-        message: "Failed to sign and encrypt oauth session",
-      },
-      { status: 500 },
-    );
+    return res.status(500).json({
+      message: "Failed to sign and encrypt oauth session",
+    });
   }
-  cookies().set(env.OAUTH_SESSION_COOKIE_NAME, jwt, {
+  nookies.set(ctx, env.OAUTH_SESSION_COOKIE_NAME, jwt, {
     path: "/api/v1/oauth/callback",
     sameSite: "lax",
     httpOnly: true,
@@ -50,5 +53,7 @@ export const GET = nextAuthMiddleware(async (req, ctx) => {
   authorizationURL.searchParams.set("code_challenge", challenge);
   authorizationURL.searchParams.set("state", state);
   authorizationURL.searchParams.set("nonce", nonce);
-  return NextResponse.redirect(authorizationURL);
+  return res.redirect(authorizationURL.toString());
 });
+
+export default router.handler();

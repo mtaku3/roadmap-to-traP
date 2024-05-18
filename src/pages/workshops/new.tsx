@@ -1,6 +1,4 @@
-"use client";
-
-import { WorkshopCreateForm } from "@/app/components/WorkshopForm";
+import { WorkshopCreateForm } from "@/client/components/WorkshopForm";
 
 export default function WorkshopCreatePage() {
   return (

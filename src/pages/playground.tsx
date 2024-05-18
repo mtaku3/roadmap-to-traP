@@ -1,8 +1,6 @@
-"use client";
-
-import { appConfigAtom, userAtom } from "@/app/atom";
-import { nodeTypes } from "@/app/components/CustomNodes";
-import { useGraph } from "@/app/utils/graph";
+import { appConfigAtom, userAtom } from "@/client/atom";
+import { nodeTypes } from "@/client/components/CustomNodes";
+import { useGraph } from "@/client/utils/graph";
 import { Workshop } from "@/modules/domain/Workshop/Entity";
 import { api } from "@/trpc/react";
 import { Button, Group, LoadingOverlay, Modal, Stack } from "@mantine/core";
@@ -10,10 +8,10 @@ import { useEffect, useMemo, useState } from "react";
 import { TbEdit, TbTrash } from "react-icons/tb";
 import ReactFlow, { Background, Controls } from "reactflow";
 import { useAtom } from "jotai";
-import { BlurredOverlay } from "@/app/components/BlurredOverlay";
+import { BlurredOverlay } from "@/client/components/BlurredOverlay";
 import { useRouter } from "next/navigation";
 import { useDisclosure } from "@mantine/hooks";
-import { WorkshopMultiSelect } from "../components/WorkshopMultiSelect";
+import { WorkshopMultiSelect } from "@/client/components/WorkshopMultiSelect";
 
 export default function Playground() {
   const [workshopIds, setWorkshopIds] = useState<string[]>([]);

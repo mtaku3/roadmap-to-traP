@@ -1,5 +1,3 @@
-"use client";
-
 import { Workshop } from "@/modules/domain/Workshop/Entity";
 import { Card, Text } from "@mantine/core";
 import Link from "next/link";
