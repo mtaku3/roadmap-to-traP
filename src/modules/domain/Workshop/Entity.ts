@@ -59,7 +59,7 @@ export class Workshop extends AggregateRoot<WorkshopProps, WorkshopId> {
     return this._props.schoolYearId;
   }
 
-  get UserId(): UserId {
+  get userId(): UserId {
     return this._props.userId;
   }
 
@@ -77,9 +77,9 @@ export class Workshop extends AggregateRoot<WorkshopProps, WorkshopId> {
 
   addCourse(course: Course) {
     if (
-      this._props.courses.find((x) =>
-        x instanceof Course ? x.id.equalsTo(course.id) : x === course,
-      ) == null
+      this._props.courses.every((x) =>
+        x instanceof Course ? !x.id.equalsTo(course.id) : x !== course,
+      )
     ) {
       this._props.courses.push(course);
     }
@@ -87,15 +87,15 @@ export class Workshop extends AggregateRoot<WorkshopProps, WorkshopId> {
 
   removeCourse(course: Course) {
     this._props.courses = this._props.courses.filter((x) =>
-      x instanceof Course ? x.id.equalsTo(course.id) : x !== course,
+      x instanceof Course ? !x.id.equalsTo(course.id) : x !== course,
     );
   }
 
   addWorkshopsDependentOn(workshopsDependentOn: WorkshopId) {
     if (
-      this._props.workshopsDependentOn.find((x) =>
-        x.equalsTo(workshopsDependentOn),
-      ) == null
+      this._props.workshopsDependentOn.every(
+        (x) => !x.equalsTo(workshopsDependentOn),
+      )
     ) {
       this._props.workshopsDependentOn.push(workshopsDependentOn);
     }
@@ -103,7 +103,7 @@ export class Workshop extends AggregateRoot<WorkshopProps, WorkshopId> {
 
   removeWorkshopsDependentOn(workshopsDependentOn: WorkshopId) {
     this._props.workshopsDependentOn = this._props.workshopsDependentOn.filter(
-      (x) => x.equalsTo(workshopsDependentOn),
+      (x) => !x.equalsTo(workshopsDependentOn),
     );
   }
 }

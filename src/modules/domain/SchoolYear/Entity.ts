@@ -25,6 +25,17 @@ export class SchoolYear extends AggregateRoot<SchoolYearProps, SchoolYearId> {
     return this._props.value;
   }
 
+  get startDate(): Date {
+    return new Date(this.value, 4, 1, 0, 0, 0, 0);
+  }
+
+  get endDate(): Date {
+    return new Date(
+      new Date(this.value + 1, 4, 1, 23, 59, 59, 999).getTime() -
+        24 * 60 * 60 * 1000,
+    );
+  }
+
   setName(name: string) {
     this._props.name = name;
   }

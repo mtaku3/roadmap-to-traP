@@ -6,6 +6,8 @@ import { Workshop } from "@/modules/domain/Workshop/Entity";
 import { IWorkshopRepository } from "@/modules/domain/Workshop/IRepository";
 import { WorkshopId } from "@/modules/domain/Workshop/Identifier";
 import { Event } from "@/modules/domain/Event/Entity";
+import { WorkshopControllerException } from "./Exception";
+import { CourseId } from "@/modules/domain/Course/Identifier";
 
 export class WorkshopController {
   constructor(private readonly workshopRepository: IWorkshopRepository) {}
@@ -59,6 +61,100 @@ export class WorkshopController {
 
     await this.workshopRepository.save(workshop);
 
+    return { workshop };
+  }
+
+  async getAll(req: GetAllRequestDTO): Promise<GetAllResponseDTO> {
+    const items = await this.workshopRepository.getAll(req.schoolYearId);
+    return { workshops: items };
+  }
+
+  async update(req: UpdateRequestDTO): Promise<UpdateResponseDTO> {
+    const workshop = await this.workshopRepository.findById(
+      new WorkshopId(req.id),
+    );
+    if (workshop == null) {
+      throw new WorkshopControllerException("Workshop not found");
+    }
+    workshop.setName(req.name);
+    workshop.setDescription(req.description);
+    for (const course of workshop.courses) {
+      const reqCourse = req.courses.find((x) =>
+        course.id.equalsTo(new CourseId(x.id)),
+      );
+      if (reqCourse != null) {
+        course.setName(reqCourse.name);
+        course.setDescription(reqCourse.description);
+        course.setOrder(reqCourse.order);
+        for (const event of course.events) {
+          if (
+            reqCourse.events.every((x) => !event.id.equalsTo(new EventId(x)))
+          ) {
+            course.removeEvent(event);
+          }
+        }
+        for (const _reqEventId of reqCourse.events) {
+          const reqEventId = new EventId(_reqEventId);
+          if (course.events.every((x) => !x.id.equalsTo(reqEventId))) {
+            course.addEvent(
+              Event.create(reqEventId, "", "", new Date(), new Date(), "", []),
+            );
+          }
+        }
+      } else {
+        workshop.removeCourse(course);
+      }
+    }
+    for (const reqCourse of req.courses) {
+      const course = workshop.courses.find((x) =>
+        x.id.equalsTo(new CourseId(reqCourse.id)),
+      );
+      if (course == null) {
+        workshop.addCourse(
+          Course.create(
+            reqCourse.name,
+            reqCourse.description,
+            reqCourse.order,
+            reqCourse.events.map((reqEventId) =>
+              Event.create(
+                new EventId(reqEventId),
+                "",
+                "",
+                new Date(),
+                new Date(),
+                "",
+                [],
+              ),
+            ),
+          ),
+        );
+      }
+    }
+    for (const workshopDependentOn of workshop.workshopsDependentOn) {
+      if (
+        req.workshopsDependentOn.every(
+          (x) => !workshopDependentOn.equalsTo(new WorkshopId(x)),
+        )
+      ) {
+        workshop.removeWorkshopsDependentOn(workshopDependentOn);
+      }
+    }
+    for (const _reqWorkshopDependentOn of req.workshopsDependentOn) {
+      const reqWorkshopDependentOn = new WorkshopId(_reqWorkshopDependentOn);
+      if (
+        workshop.workshopsDependentOn.every(
+          (x) => !x.equalsTo(reqWorkshopDependentOn),
+        )
+      ) {
+        workshop.addWorkshopsDependentOn(reqWorkshopDependentOn);
+      }
+    }
+    await this.workshopRepository.save(workshop);
+    return {};
+  }
+
+  async delete(req: DeleteRequestDTO): Promise<DeleteResponseDTO> {
+    await this.workshopRepository.delete(req.id);
     return {};
   }
 
@@ -98,6 +194,38 @@ export interface CreateRequestDTO {
   userId: string;
 }
 
-export interface CreateResponseDTO {}
+export interface CreateResponseDTO {
+  workshop: Workshop;
+}
+
+export interface GetAllRequestDTO {
+  schoolYearId: SchoolYearId;
+}
+
+export interface GetAllResponseDTO {
+  workshops: Workshop[];
+}
+
+export interface UpdateRequestDTO {
+  id: string;
+  name: string;
+  description: string;
+  courses: {
+    id: string;
+    name: string;
+    description: string;
+    order: number;
+    events: string[];
+  }[];
+  workshopsDependentOn: string[];
+}
+
+export interface UpdateResponseDTO {}
+
+export interface DeleteRequestDTO {
+  id: WorkshopId;
+}
+
+export interface DeleteResponseDTO {}
 
 /* __PLOP_DTO_APPEND__ */

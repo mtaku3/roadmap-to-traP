@@ -63,7 +63,7 @@ export class Course extends Entity<CourseProps, CourseId> {
 
   removeEvent(event: Event) {
     this._props.events = this._props.events.filter((x) =>
-      x instanceof Event ? x.id.equalsTo(event.id) : x !== event,
+      x instanceof Event ? !x.id.equalsTo(event.id) : x !== event,
     );
   }
 }

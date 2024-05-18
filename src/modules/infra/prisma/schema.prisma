@@ -31,7 +31,7 @@ model SchoolYear {
 
 model WorkshopDependency {
   id                    String   @id @default(uuid())
-  workshop              Workshop @relation(name: "from", fields: [workshopId], references: [id])
+  workshop              Workshop @relation(name: "from", fields: [workshopId], references: [id], onDelete: Cascade)
   workshopId            String
   workshopDependentOn   Workshop @relation(name: "to", fields: [workshopDependentOnId], references: [id])
   workshopDependentOnId String
@@ -57,13 +57,13 @@ model Course {
   name        String
   description String
   order       Int
-  workshop    Workshop @relation(fields: [workshopId], references: [id])
+  workshop    Workshop @relation(fields: [workshopId], references: [id], onDelete: Cascade)
   workshopId  String
   events      Event[]
 }
 
 model Event {
   id       String @id
-  course   Course @relation(fields: [courseId], references: [id])
+  course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
   courseId String
 }

@@ -50,24 +50,81 @@ export class WorkshopRepository implements IWorkshopRepository {
   async save(workshop: Workshop): Promise<void> {
     const ops = [];
 
-    for (const course of workshop.courses) {
-      for (const event of course.events) {
-        ops.push(
-          this.prisma.event.upsert({
-            create: {
-              id: event.id.toString(),
-              courseId: course.id.toString(),
-            },
-            update: {
-              courseId: course.id.toString(),
-            },
-            where: {
-              id: event.id.toString(),
-            },
-          }),
-        );
-      }
+    ops.push(
+      this.prisma.event.deleteMany({
+        where: {
+          AND: workshop.courses
+            .map((course) =>
+              course.events.map((event) => ({
+                NOT: {
+                  id: event.id.toString(),
+                },
+              })),
+            )
+            .flat(),
+        },
+      }),
+    );
 
+    ops.push(
+      this.prisma.workshop.upsert({
+        create: {
+          id: workshop.id.toString(),
+          name: workshop.name,
+          description: workshop.description,
+          schoolYearId: workshop.schoolYearId.toString(),
+          userId: workshop.userId.toString(),
+        },
+        update: {
+          name: workshop.name,
+          description: workshop.description,
+          schoolYearId: workshop.schoolYearId.toString(),
+          courses: {
+            deleteMany: {
+              AND: workshop.courses.map((course) => {
+                return {
+                  NOT: {
+                    id: course.id.toString(),
+                  },
+                };
+              }),
+            },
+          },
+          workshopsDependentOn: {
+            deleteMany: {
+              AND: workshop.workshopsDependentOn.map((workshopDependentOn) => ({
+                NOT: {
+                  workshopDependentOnId: workshopDependentOn.toString(),
+                },
+              })),
+            },
+          },
+        },
+        where: {
+          id: workshop.id.toString(),
+        },
+      }),
+    );
+
+    for (const workshopDependentOn of workshop.workshopsDependentOn) {
+      ops.push(
+        this.prisma.workshopDependency.upsert({
+          create: {
+            workshopId: workshop.id.toString(),
+            workshopDependentOnId: workshopDependentOn.toString(),
+          },
+          update: {},
+          where: {
+            workshopId_workshopDependentOnId: {
+              workshopId: workshop.id.toString(),
+              workshopDependentOnId: workshopDependentOn.toString(),
+            },
+          },
+        }),
+      );
+    }
+
+    for (const course of workshop.courses) {
       ops.push(
         this.prisma.course.upsert({
           create: {
@@ -88,37 +145,24 @@ export class WorkshopRepository implements IWorkshopRepository {
           },
         }),
       );
-    }
 
-    ops.push(
-      this.prisma.workshop.upsert({
-        create: {
-          id: workshop.id.toString(),
-          name: workshop.name,
-          description: workshop.description,
-          schoolYearId: workshop.schoolYearId.toString(),
-        },
-        update: {
-          name: workshop.name,
-          description: workshop.description,
-          schoolYearId: workshop.schoolYearId.toString(),
-          courses: {
-            deleteMany: {
-              AND: workshop.courses.map((course) => {
-                return {
-                  NOT: {
-                    id: course.id.toString(),
-                  },
-                };
-              }),
+      for (const event of course.events) {
+        ops.push(
+          this.prisma.event.upsert({
+            create: {
+              id: event.id.toString(),
+              courseId: course.id.toString(),
             },
-          },
-        },
-        where: {
-          id: workshop.id.toString(),
-        },
-      }),
-    );
+            update: {
+              courseId: course.id.toString(),
+            },
+            where: {
+              id: event.id.toString(),
+            },
+          }),
+        );
+      }
+    }
 
     await this.prisma.$transaction(ops);
   }
@@ -165,6 +209,23 @@ export class WorkshopRepository implements IWorkshopRepository {
       workshops: await Promise.all(items.map((x) => this.buildWorkshop(x))),
       nextCursor,
     };
+  }
+
+  async getAll(schoolYearId: SchoolYearId): Promise<Workshop[]> {
+    const items = await this.prisma.workshop.findMany({
+      include: {
+        courses: {
+          include: {
+            events: true,
+          },
+        },
+        workshopsDependentOn: true,
+      },
+      where: {
+        schoolYearId: schoolYearId.toString(),
+      },
+    });
+    return await Promise.all(items.map((x) => this.buildWorkshop(x)));
   }
 
   private async buildWorkshop(

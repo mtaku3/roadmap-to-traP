@@ -13,4 +13,5 @@ export interface IWorkshopRepository {
     limit?: number,
     cursor?: string,
   ): Promise<{ workshops: Workshop[]; nextCursor?: string }>;
+  getAll(schoolYearId: SchoolYearId): Promise<Workshop[]>;
 }

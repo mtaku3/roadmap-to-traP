@@ -50,12 +50,12 @@ export class {{{Name}}} extends {{{type}}}<{{{Name}}}Props, {{{Name}}}Id> {
     if (this._props{{#if isNullable}}?{{/if}}.{{{name}}} == null) {
       this._props.{{{name}}} = [{{{singularize name}}}];
     } else {
-      if (this._props.{{{name}}}.find((x) => x instanceof {{{singularize Name}}} ? x.id.equalsTo({{{singularize name}}}.id) : x === {{{singularize name}}}) == null) {
+      if (this._props.{{{name}}}.every((x) => x instanceof {{{singularize Name}}} ? !x.id.equalsTo({{{singularize name}}}.id) : x !== {{{singularize name}}})) {
         this._props.{{{name}}}.push({{{singularize name}}});
       }
     }
     {{else}}
-    if (this._props.{{{name}}}.find((x) => x instanceof {{{singularize Name}}} ? x.id.equalsTo({{{singularize name}}}.id) : x === {{{singularize name}}}) == null) {
+    if (this._props.{{{name}}}.every((x) => x instanceof {{{singularize Name}}} ? !x.id.equalsTo({{{singularize name}}}.id) : x !== {{{singularize name}}})) {
       this._props.{{{name}}}.push({{{singularize name}}});
     }
     {{/if}}
@@ -66,9 +66,9 @@ export class {{{Name}}} extends {{{type}}}<{{{Name}}}Props, {{{Name}}}Id> {
     if (this._props{{#if isNullable}}?{{/if}}.{{{name}}} == null) {
       return;
     }
-    this._props.{{{name}}} = this._props.{{{name}}}.filter((x) => x instanceof {{{singularize Name}}} ? x.id.equalsTo({{{singularize name}}}.id) : x !== {{{singularize name}}});
+    this._props.{{{name}}} = this._props.{{{name}}}.filter((x) => x instanceof {{{singularize Name}}} ? !x.id.equalsTo({{{singularize name}}}.id) : x !== {{{singularize name}}});
     {{else}}
-    this._props.{{{name}}} = this._props.{{{name}}}.filter((x) => x instanceof {{{singularize Name}}} ? x.id.equalsTo({{{singularize name}}}.id) : x !== {{{singularize name}}});
+    this._props.{{{name}}} = this._props.{{{name}}}.filter((x) => x instanceof {{{singularize Name}}} ? !x.id.equalsTo({{{singularize name}}}.id) : x !== {{{singularize name}}});
     {{/if}}
   }
 {{else}}
