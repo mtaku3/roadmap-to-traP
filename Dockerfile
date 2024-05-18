@@ -15,7 +15,7 @@ COPY docker-entrypoint.sh /usr/local/bin
 ENTRYPOINT ["docker-entrypoint.sh"]
 
 
-FROM base as production
+FROM node:22.1.0 as production
 
 RUN apt-get update && apt-get install -y bash curl \
     && curl -1sLf 'https://dl.cloudsmith.io/public/infisical/infisical-cli/setup.deb.sh' | bash \
@@ -25,6 +25,7 @@ RUN apt-get update && apt-get install -y bash curl \
 ENV NODE_ENV production
 ENV PORT 80
 
+COPY . ./
 RUN npm install \
     && npm run build
 
