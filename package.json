@@ -4,7 +4,7 @@
   "private": true,
   "prisma": {
     "schema": "src/modules/infra/prisma/schema.prisma",
-    "seed": "tsx --env-file=.env.local src/modules/infra/prisma/seed.ts"
+    "seed": "tsx src/modules/infra/prisma/seed.ts"
   },
   "scripts": {
     "dev": "next dev",
