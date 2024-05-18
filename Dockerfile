@@ -29,7 +29,7 @@ ENV PORT 80
 COPY --chown=node:node . /home/node/app
 ENTRYPOINT ["/home/node/app/docker-entrypoint.prod.sh"]
 
-RUN npm install \
+RUN NODE_ENV=development npm install \
     && npx prisma generate \
     && npm run build:compile
 
