@@ -1,3 +1,5 @@
+"use client";
+
 import {
   ActionIcon,
   Avatar,
@@ -9,7 +11,7 @@ import {
   Text,
   UnstyledButton,
 } from "@mantine/core";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { TbLogin, TbLogout } from "react-icons/tb";
 import { User } from "@/modules/domain/User/Entity";
 import { useAtom } from "jotai";

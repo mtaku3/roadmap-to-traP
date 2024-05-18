@@ -1,4 +1,6 @@
-import { appConfigAtom, userAtom } from "../atom";
+"use client";
+
+import { appConfigAtom, userAtom } from "@/app/atom";
 import { api } from "@/trpc/react";
 import {
   Alert,
