@@ -23,6 +23,7 @@ RUN apt-get update && apt-get install -y bash curl \
 
 USER node
 WORKDIR /home/node/app
+ARG INFISICAL_TOKEN
 ENV NODE_ENV production
 ENV PORT 80
 
