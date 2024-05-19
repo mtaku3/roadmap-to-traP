@@ -13,7 +13,7 @@ router.get(async (req, res) => {
   const authCtx = await authenticate(req, res);
 
   if (authCtx.user != null) {
-    return res.redirect("/");
+    return res.redirect(`${env.NEXT_PUBLIC_URL}/`);
   }
 
   const verifier = generators.codeVerifier();
