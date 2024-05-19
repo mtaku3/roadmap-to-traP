@@ -27,7 +27,9 @@ router.delete(async (req, res) => {
     console.warn("Failed to revoke token", e);
   }
 
-  nookies.destroy(ctx, env.APP_AUTH_SESSION_COOKIE_NAME);
+  nookies.destroy(ctx, env.APP_AUTH_SESSION_COOKIE_NAME, {
+    path: "/",
+  });
 
   return res.status(200).send(null);
 });
