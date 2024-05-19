@@ -102,5 +102,3 @@ export default function WorkshopDetails({
     </>
   );
 }
-
-export const revalidate = 0;

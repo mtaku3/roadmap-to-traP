@@ -152,5 +152,3 @@ export async function GET(req: NextRequest) {
 
   return NextResponse.redirect(new URL("/", env.NEXT_PUBLIC_URL));
 }
-
-export const revalidate = 0;

@@ -25,5 +25,3 @@ export default function WorkshopUpdatePage({
     </>
   );
 }
-
-export const revalidate = 0;
