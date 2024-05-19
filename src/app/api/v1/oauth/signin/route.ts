@@ -7,7 +7,7 @@ import { nextAuthMiddleware } from "../auth";
 
 export const GET = nextAuthMiddleware(async (req, ctx) => {
   if (ctx.user != null) {
-    return NextResponse.redirect(new URL("/", env.NEXT_PUBLIC_URL));
+    return NextResponse.redirect(new URL("/", req.url));
   }
 
   const verifier = generators.codeVerifier();
