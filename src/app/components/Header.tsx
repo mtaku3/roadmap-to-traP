@@ -70,7 +70,7 @@ function SchoolYearSelection({
 }) {
   return (
     <Select
-      w="96px"
+      w="70px"
       allowDeselect={false}
       data={schoolYears?.map((sy) => ({
         value: sy.value.toString(),
