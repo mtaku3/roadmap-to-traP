@@ -1,17 +1,13 @@
-"use client";
-
-import { WorkshopUpdateForm } from "@/app/components/WorkshopForm";
+import { WorkshopUpdateForm } from "@/client/components/WorkshopForm";
 import { api } from "@/trpc/react";
 import { Loader } from "@mantine/core";
+import { useRouter } from "next/router";
 
-export default function WorkshopUpdatePage({
-  params,
-}: {
-  params: { workshopId: string };
-}) {
+export default function WorkshopUpdatePage() {
+  const router = useRouter();
   const { data: workshop, isPending: isPending } =
     api.tq.workshop.findById.useQuery({
-      id: params.workshopId,
+      id: router.query.workshopId as string,
     });
 
   if (isPending || workshop == null) {

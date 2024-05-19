@@ -1,5 +1,3 @@
-"use client";
-
 import { api } from "@/trpc/react";
 import {
   Alert,
@@ -13,10 +11,10 @@ import {
   Title,
 } from "@mantine/core";
 import { useAtom } from "jotai";
-import { appConfigAtom, userAtom } from "./atom";
-import WorkshopCard from "./components/WorkshopCard";
+import { appConfigAtom, userAtom } from "@/client/atom";
+import WorkshopCard from "@/client/components/WorkshopCard";
 import Link from "next/link";
-import { BlurredOverlay } from "./components/BlurredOverlay";
+import { BlurredOverlay } from "@/client/components/BlurredOverlay";
 
 export default function Home() {
   const [_appConfig] = useAtom(appConfigAtom);

@@ -1,8 +1,6 @@
-"use client";
-
-import { userAtom } from "@/app/atom";
-import { nodeTypes } from "@/app/components/CustomNodes";
-import { useGraph } from "@/app/utils/graph";
+import { userAtom } from "@/client/atom";
+import { nodeTypes } from "@/client/components/CustomNodes";
+import { useGraph } from "@/client/utils/graph";
 import { Workshop } from "@/modules/domain/Workshop/Entity";
 import { api } from "@/trpc/react";
 import { Button, Group, LoadingOverlay, Modal, Stack } from "@mantine/core";
@@ -10,23 +8,18 @@ import { useEffect, useState } from "react";
 import { TbEdit, TbTrash } from "react-icons/tb";
 import ReactFlow, { Background, Controls } from "reactflow";
 import { useAtom } from "jotai";
-import { BlurredOverlay } from "@/app/components/BlurredOverlay";
-import { useRouter } from "next/navigation";
+import { BlurredOverlay } from "@/client/components/BlurredOverlay";
 import { useDisclosure } from "@mantine/hooks";
+import { useRouter } from "next/router";
 
-export default function WorkshopDetails({
-  params,
-}: {
-  params: {
-    workshopId: string;
-  };
-}) {
+export default function WorkshopDetails() {
   const router = useRouter();
+  const workshopId = router.query.workshopId as string;
   const [opened, { open, close }] = useDisclosure(false);
   const [workshops, setWorkshops] = useState<Workshop[]>([]);
   const { data: workshop, isPending: isWorkshopPending } =
     api.tq.workshop.findById.useQuery({
-      id: params.workshopId,
+      id: workshopId,
     });
   const { isPending: isGraphPending, nodes, edges } = useGraph(workshops);
   const isPending = isWorkshopPending || isGraphPending;
@@ -61,7 +54,7 @@ export default function WorkshopDetails({
           <Button
             color="green"
             leftSection={<TbEdit />}
-            onClick={() => router.push(`/workshops/${params.workshopId}/edit`)}
+            onClick={() => router.push(`/workshops/${workshopId}/edit`)}
           >
             編集
           </Button>
@@ -78,7 +71,7 @@ export default function WorkshopDetails({
               <Button
                 color="red"
                 onClick={async () => {
-                  await api.v.workshop.delete.mutate({ id: params.workshopId });
+                  await api.v.workshop.delete.mutate({ id: workshopId });
                   router.push("/");
                 }}
                 className="flex-1"
