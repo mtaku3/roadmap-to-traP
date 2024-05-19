@@ -4,7 +4,7 @@ import { SchoolYearId } from "@/modules/domain/SchoolYear/Identifier";
 
 async function main() {
   const schoolYear = new SchoolYear(
-    { name: "R6", value: 2024 },
+    { name: "2024", value: 2024 },
     new SchoolYearId("740d929a-64f0-4145-9f0f-0d00cb0aa018"),
   );
   await di.cradle.schoolYearRepository.save(schoolYear);

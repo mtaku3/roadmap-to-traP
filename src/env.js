@@ -16,6 +16,9 @@ export const env = createEnv({
     TRAQ_AUTH_USERNAME: z.string(),
     TRAQ_AUTH_PASSWORD: z.string(),
   },
+  shared: {
+    NEXT_PUBLIC_URL: z.string().url(),
+  },
   client: {},
   runtimeEnv: {
     NODE_ENV: process.env.NODE_ENV,
@@ -30,5 +33,6 @@ export const env = createEnv({
     JWT_DECRYPTION_SECRET: process.env.JWT_DECRYPTION_SECRET,
     TRAQ_AUTH_USERNAME: process.env.TRAQ_AUTH_USERNAME,
     TRAQ_AUTH_PASSWORD: process.env.TRAQ_AUTH_PASSWORD,
+    NEXT_PUBLIC_URL: process.env.NEXT_PUBLIC_URL,
   },
 });

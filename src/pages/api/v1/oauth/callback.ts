@@ -130,7 +130,7 @@ router.get(async (req, res) => {
     secure: env.NODE_ENV === "production",
   });
 
-  return res.redirect("/");
+  return res.redirect(`${env.NEXT_PUBLIC_URL}/`);
 });
 
 export default router.handler();
