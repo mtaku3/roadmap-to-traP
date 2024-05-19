@@ -10,3 +10,5 @@ export default function WorkshopCreatePage() {
     </>
   );
 }
+
+export const revalidate = 0;

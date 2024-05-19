@@ -52,3 +52,5 @@ export const GET = nextAuthMiddleware(async (req, ctx) => {
   authorizationURL.searchParams.set("nonce", nonce);
   return NextResponse.redirect(authorizationURL);
 });
+
+export const revalidate = 0;

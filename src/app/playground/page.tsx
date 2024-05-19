@@ -73,3 +73,5 @@ export default function Playground() {
     </>
   );
 }
+
+export const revalidate = 0;
