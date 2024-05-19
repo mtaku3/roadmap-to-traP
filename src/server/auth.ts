@@ -36,6 +36,7 @@ export async function authenticate(
   try {
     payload = await decryptAndVerify<AppAuthSessionJWTPayload>(jwt);
   } catch (e) {
+    nookies.destroy(ctx, env.APP_AUTH_SESSION_COOKIE_NAME, { path: "/" });
     throw new AuthMiddlewareException(
       "Failed to decrypt and verify app auth session",
     );
