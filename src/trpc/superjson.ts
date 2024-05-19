@@ -13,15 +13,19 @@ import { WorkshopId } from "@/modules/domain/Workshop/Identifier";
 import SuperJSON from "superjson";
 
 const entities = [
-  { Entity: Course, Identifier: CourseId },
-  { Entity: Event, Identifier: EventId },
-  { Entity: EventAttendance, Identifier: EventAttendanceId },
-  { Entity: SchoolYear, Identifier: SchoolYearId },
-  { Entity: User, Identifier: UserId },
-  { Entity: Workshop, Identifier: WorkshopId },
+  { name: "Course", Entity: Course, Identifier: CourseId },
+  { name: "Event", Entity: Event, Identifier: EventId },
+  {
+    name: "EventAttendance",
+    Entity: EventAttendance,
+    Identifier: EventAttendanceId,
+  },
+  { name: "SchoolYear", Entity: SchoolYear, Identifier: SchoolYearId },
+  { name: "User", Entity: User, Identifier: UserId },
+  { name: "Workshop", Entity: Workshop, Identifier: WorkshopId },
 ];
 
-for (const { Entity, Identifier } of entities) {
+for (const { name, Entity, Identifier } of entities) {
   SuperJSON.registerCustom<InstanceType<typeof Entity>, string>(
     {
       isApplicable: (v): v is InstanceType<typeof Entity> =>
@@ -39,7 +43,7 @@ for (const { Entity, Identifier } of entities) {
         return new Entity(v.props as any, v.id as any);
       },
     },
-    Entity.name,
+    `${name}Entity`,
   );
 
   SuperJSON.registerCustom<InstanceType<typeof Identifier>, string>(
@@ -49,7 +53,7 @@ for (const { Entity, Identifier } of entities) {
       serialize: (v) => v._value,
       deserialize: (v) => new Identifier(v),
     },
-    Identifier.name,
+    `${name}Identifier`,
   );
 }
 
