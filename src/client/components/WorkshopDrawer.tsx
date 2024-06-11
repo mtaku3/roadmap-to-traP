@@ -144,7 +144,16 @@ function MultiCoursesAccordion({ courses }: { courses: Course[] }) {
             );
             return (
               <Accordion.Item key={idx} value={course.id.toString()}>
-                <Accordion.Control>{course.name}</Accordion.Control>
+                <Accordion.Control>
+                  <Stack gap={0}>
+                    <Text fw={700} size="lg">
+                      {course.name}
+                    </Text>
+                    <Text c="dimmed" size="sm">
+                      {course.description}
+                    </Text>
+                  </Stack>
+                </Accordion.Control>
                 <Accordion.Panel>
                   <Stack gap={1}>
                     {events.map((event, idx) => (
