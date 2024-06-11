@@ -5,6 +5,7 @@
     prettierd
     eslint_d
     nodePackages.typescript-language-server
+    go-task
   ];
 
   languages.javascript = {
