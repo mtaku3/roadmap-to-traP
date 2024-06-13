@@ -47,7 +47,13 @@ export class WorkshopController {
         );
       }
       courses.push(
-        Course.create(_course.name, _course.description, _course.order, events),
+        Course.create(
+          _course.name,
+          _course.description,
+          _course.memo,
+          _course.order,
+          events,
+        ),
       );
     }
     const workshop = Workshop.create(
@@ -85,6 +91,7 @@ export class WorkshopController {
       if (reqCourse != null) {
         course.setName(reqCourse.name);
         course.setDescription(reqCourse.description);
+        course.setMemo(reqCourse.memo);
         course.setOrder(reqCourse.order);
         for (const event of course.events) {
           if (
@@ -114,6 +121,7 @@ export class WorkshopController {
           Course.create(
             reqCourse.name,
             reqCourse.description,
+            reqCourse.memo,
             reqCourse.order,
             reqCourse.events.map((reqEventId) =>
               Event.create(
@@ -186,6 +194,7 @@ export interface CreateRequestDTO {
   courses: {
     name: string;
     description: string;
+    memo: string;
     order: number;
     events: string[];
   }[];
@@ -214,6 +223,7 @@ export interface UpdateRequestDTO {
     id: string;
     name: string;
     description: string;
+    memo: string;
     order: number;
     events: string[];
   }[];

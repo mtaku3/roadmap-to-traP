@@ -46,8 +46,10 @@ export function WorkshopDrawer({
   function setShowOutdatedEvents(value: boolean) {
     setUserConfig({ ...userConfig, showOutdatedEvents: value });
   }
-
-  const now = new Date();
+  const [_user] = useAtom(userAtom);
+  const isUserPending = _user.state === "loading";
+  const user = _user.state === "hasData" ? _user.data : undefined;
+  const showMemo = user != null && workshop.userId.equalsTo(user.id);
 
   return (
     <Drawer position="right" opened={opened} onClose={close}>
@@ -75,10 +77,13 @@ export function WorkshopDrawer({
           />
         </Stack>
         {workshop.courses.length === 1 && (
-          <SingleCourse course={workshop.courses[0]} />
+          <SingleCourse course={workshop.courses[0]} showMemo={showMemo} />
         )}
         {workshop.courses.length > 1 && (
-          <MultiCoursesAccordion courses={workshop.courses} />
+          <MultiCoursesAccordion
+            courses={workshop.courses}
+            showMemo={showMemo}
+          />
         )}
         {workshop.courses.length === 0 && (
           <EventNotFound
@@ -98,7 +103,13 @@ function filterAndSortEvents(events: Event[], showOutdatedEvents: boolean) {
     .sort((x, y) => x.timeStart.getTime() - y.timeStart.getTime());
 }
 
-function SingleCourse({ course }: { course: Course }) {
+function SingleCourse({
+  course,
+  showMemo,
+}: {
+  course: Course;
+  showMemo: boolean;
+}) {
   const [userConfig] = useAtom(userConfigAtom);
   const events = filterAndSortEvents(
     course.events,
@@ -106,6 +117,11 @@ function SingleCourse({ course }: { course: Course }) {
   );
   return (
     <Stack gap={1}>
+      {showMemo && (
+        <Text c="teal.4" size="sm">
+          {course.memo}
+        </Text>
+      )}
       {events.map((event, idx) => (
         <React.Fragment key={idx}>
           <EventCard event={event} />
@@ -120,7 +136,13 @@ function SingleCourse({ course }: { course: Course }) {
   );
 }
 
-function MultiCoursesAccordion({ courses }: { courses: Course[] }) {
+function MultiCoursesAccordion({
+  courses,
+  showMemo,
+}: {
+  courses: Course[];
+  showMemo: boolean;
+}) {
   const [userConfig] = useAtom(userConfigAtom);
   const [value, setValue] = useState<string[]>(
     courses.map((x) => x.id.toString()),
@@ -152,6 +174,11 @@ function MultiCoursesAccordion({ courses }: { courses: Course[] }) {
                     <Text c="dimmed" size="sm">
                       {course.description}
                     </Text>
+                    {showMemo && (
+                      <Text c="teal.4" size="sm">
+                        {course.memo}
+                      </Text>
+                    )}
                   </Stack>
                 </Accordion.Control>
                 <Accordion.Panel>

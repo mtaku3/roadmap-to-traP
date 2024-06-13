@@ -128,12 +128,14 @@ export class WorkshopRepository implements IWorkshopRepository {
             id: course.id.toString(),
             name: course.name,
             description: course.description,
+            memo: course.memo,
             order: course.order,
             workshopId: workshop.id.toString(),
           },
           update: {
             name: course.name,
             description: course.description,
+            memo: course.memo,
             order: course.order,
             workshopId: workshop.id.toString(),
           },
@@ -264,6 +266,7 @@ export class WorkshopRepository implements IWorkshopRepository {
           {
             name: course.name,
             description: course.description,
+            memo: course.memo,
             order: course.order,
             events,
           },

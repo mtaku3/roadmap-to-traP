@@ -72,6 +72,7 @@ export function WorkshopUpdateForm({
           id: x.id.toString(),
           name: x.name,
           description: x.description,
+          memo: x.memo,
           order: x.order,
           events: x.events.map((x) => x.id.toString()),
         })),
@@ -179,6 +180,7 @@ export function WorkshopUpdateForm({
                   id: uuidv4(),
                   name: "",
                   description: "",
+                  memo: "",
                   order: courses.length + 1,
                   events: [],
                 })
@@ -355,6 +357,7 @@ export function WorkshopCreateForm() {
                   id: uuidv4(),
                   name: "",
                   description: "",
+                  memo: "",
                   order: courses.length + 1,
                   events: [],
                 })
@@ -562,6 +565,20 @@ function CourseDrawerForm({
         />
         <Controller
           control={control}
+          name={`courses.${index}.memo`}
+          render={({ field }) => (
+            <Textarea
+              label="管理者用メモ欄"
+              placeholder=""
+              description="開催者側のメモとしてご利用ください。利用者に表示されることはありません。（データとしては配信されるのでセンシティブな情報は記入しないでください）"
+              value={field.value}
+              onBlur={field.onBlur}
+              onChange={(e) => field.onChange(e.currentTarget.value)}
+            />
+          )}
+        />
+        <Controller
+          control={control}
           name={`courses.${index}.events`}
           render={({ field }) => (
             <Stack pos="relative">
@@ -691,6 +708,9 @@ function CourseCard({
             <Text c="dimmed" size="sm">
               {course.description}
             </Text>
+            <Text c="teal.4" size="sm">
+              {course.memo}
+            </Text>
           </Stack>
           <Group className="shrink-0">
             <ActionIcon color="green" onClick={() => open()}>
@@ -725,6 +745,7 @@ export interface IWorkshopCreateForm {
     id: string;
     name: string;
     description: string;
+    memo: string;
     order: number;
     events: string[];
   }[];
@@ -740,6 +761,7 @@ export interface IWorkshopUpdateForm {
     id: string;
     name: string;
     description: string;
+    memo: string;
     order: number;
     events: string[];
   }[];

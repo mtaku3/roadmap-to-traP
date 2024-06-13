@@ -5,6 +5,7 @@ import { Event } from "../Event/Entity";
 export interface CourseProps {
   name: string;
   description: string;
+  memo: string;
   order: number;
   events: Event[];
 }
@@ -13,6 +14,7 @@ export class Course extends Entity<CourseProps, CourseId> {
   static create(
     name: string,
     description: string,
+    memo: string,
     order: number,
     events: Event[],
   ) {
@@ -20,6 +22,7 @@ export class Course extends Entity<CourseProps, CourseId> {
       {
         name,
         description,
+        memo,
         order,
         events,
       },
@@ -33,6 +36,10 @@ export class Course extends Entity<CourseProps, CourseId> {
 
   get description(): string {
     return this._props.description;
+  }
+
+  get memo(): string {
+    return this._props.memo;
   }
 
   get order(): number {
@@ -51,6 +58,10 @@ export class Course extends Entity<CourseProps, CourseId> {
 
   setDescription(description: string) {
     this._props.description = description;
+  }
+
+  setMemo(memo: string) {
+    this._props.memo = memo;
   }
 
   setOrder(order: number) {

@@ -49,6 +49,7 @@ export const workshopRouter = createTRPCRouter({
           z.object({
             name: z.string(),
             description: z.string(),
+            memo: z.string(),
             order: z.number().int(),
             events: z.array(z.string()),
           }),
@@ -88,6 +89,7 @@ export const workshopRouter = createTRPCRouter({
             id: z.string(),
             name: z.string(),
             description: z.string(),
+            memo: z.string(),
             order: z.number().int(),
             events: z.array(z.string()),
           }),
