@@ -3,7 +3,8 @@
   "packages": [
     "go@latest",
     "gopls@latest",
-    "nodejs@20"
+    "nodejs@20",
+    "mariadb-client@latest"
   ],
   "shell": {
     "init_hook": [

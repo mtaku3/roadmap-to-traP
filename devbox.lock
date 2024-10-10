@@ -97,6 +97,12 @@
         }
       }
     },
+    "mariadb-client@latest": {
+      "last_modified": "2023-02-24T09:01:09Z",
+      "resolved": "github:NixOS/nixpkgs/7d0ed7f2e5aea07ab22ccb338d27fbe347ed2f11#mariadb-client",
+      "source": "devbox-search",
+      "version": "10.6.12"
+    },
     "nodejs@20": {
       "last_modified": "2024-09-10T15:01:03Z",
       "plugin_version": "0.0.2",
