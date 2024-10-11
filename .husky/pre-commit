@@ -1,1 +1,1 @@
-npx lint-staged
+pushd ./backend && go fmt && popd

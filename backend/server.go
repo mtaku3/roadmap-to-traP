@@ -1,19 +1,27 @@
 package main
 
 import (
+	"roadmap-to-trap/model"
+	"roadmap-to-trap/router"
+
 	"github.com/labstack/echo/v4"
-	"gorm.io/driver/mysql"
-	"gorm.io/gorm"
-	"net/http"
 )
 
 func main() {
-	dsn := "root:password@tcp(127.0.0.1:3306)/dev?charset=utf8mb4&parseTime=True&loc=Local"
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	err := model.Init()
+	if err != nil {
+		panic("Failed to connect to database")
+	}
+	err = model.Migrate()
+	if err != nil {
+		panic("Failed to migrate database")
+	}
+	err = model.Seed()
+	if err != nil {
+		panic("Failed to seed database")
+	}
 
 	e := echo.New()
-	e.GET("/", func(c echo.Context) error {
-		return c.String(http.StatusOK, "Hello World!")
-	})
+	router.Init(e)
 	e.Logger.Fatal(e.Start(":1323"))
 }
