@@ -5,7 +5,8 @@
     "gopls@latest",
     "nodejs@20",
     "mariadb-client@latest",
-    "prettierd@latest"
+    "prettierd@latest",
+    "typescript-language-server@latest"
   ],
   "shell": {
     "init_hook": [

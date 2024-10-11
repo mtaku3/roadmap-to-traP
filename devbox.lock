@@ -215,6 +215,54 @@
           "store_path": "/nix/store/d1laj0rnvlpz5l4xyalx87sxslkccl0w-fsouza-prettierd-0.25.3"
         }
       }
+    },
+    "typescript-language-server@latest": {
+      "last_modified": "2024-09-29T22:19:52Z",
+      "resolved": "github:NixOS/nixpkgs/4e0c36e4dd53f35d5a6385bdae88895ec5832f70#typescript-language-server",
+      "source": "devbox-search",
+      "version": "4.3.3",
+      "systems": {
+        "aarch64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/p13b0sm7pfhv4gyzsj6i1334i9rgvzi9-typescript-language-server-4.3.3",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/p13b0sm7pfhv4gyzsj6i1334i9rgvzi9-typescript-language-server-4.3.3"
+        },
+        "aarch64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/mqhkzdmrm1f6wggxk9sasd61pqd5yjv6-typescript-language-server-4.3.3",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/mqhkzdmrm1f6wggxk9sasd61pqd5yjv6-typescript-language-server-4.3.3"
+        },
+        "x86_64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/934l9i9k6xpp1pnr9djx54xnsi71n4rl-typescript-language-server-4.3.3",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/934l9i9k6xpp1pnr9djx54xnsi71n4rl-typescript-language-server-4.3.3"
+        },
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/a9fqwmq6nm2xn945yy9z6qhdxni03gq1-typescript-language-server-4.3.3",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/a9fqwmq6nm2xn945yy9z6qhdxni03gq1-typescript-language-server-4.3.3"
+        }
+      }
     }
   }
 }
