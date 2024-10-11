@@ -167,6 +167,54 @@
           "store_path": "/nix/store/w78sh036dyn14f29w8za9ni9syrmwm3q-nodejs-20.17.0"
         }
       }
+    },
+    "prettierd@latest": {
+      "last_modified": "2024-09-10T15:01:03Z",
+      "resolved": "github:NixOS/nixpkgs/5ed627539ac84809c78b2dd6d26a5cebeb5ae269#prettierd",
+      "source": "devbox-search",
+      "version": "0.25.3",
+      "systems": {
+        "aarch64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/63m2ql6mj58jy7276058pddjzak1d92q-fsouza-prettierd-0.25.3",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/63m2ql6mj58jy7276058pddjzak1d92q-fsouza-prettierd-0.25.3"
+        },
+        "aarch64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/a5rq7ish4qkzyp3mf9qrj7kilwmph0rh-fsouza-prettierd-0.25.3",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/a5rq7ish4qkzyp3mf9qrj7kilwmph0rh-fsouza-prettierd-0.25.3"
+        },
+        "x86_64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/1w522wpr1rsjm7k5c940niwlm45ld4p0-fsouza-prettierd-0.25.3",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/1w522wpr1rsjm7k5c940niwlm45ld4p0-fsouza-prettierd-0.25.3"
+        },
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/d1laj0rnvlpz5l4xyalx87sxslkccl0w-fsouza-prettierd-0.25.3",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/d1laj0rnvlpz5l4xyalx87sxslkccl0w-fsouza-prettierd-0.25.3"
+        }
+      }
     }
   }
 }
