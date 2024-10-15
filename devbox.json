@@ -6,7 +6,8 @@
     "nodejs@20",
     "mariadb-client@latest",
     "prettierd@latest",
-    "typescript-language-server@latest"
+    "typescript-language-server@latest",
+    "tailwindcss-language-server@latest"
   ],
   "shell": {
     "init_hook": [

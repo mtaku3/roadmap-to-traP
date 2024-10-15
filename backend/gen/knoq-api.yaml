@@ -1,0 +1,1264 @@
+openapi: '3.0.2'
+
+info:
+  title: traP knoQ
+  description: |
+    This is a sample knoQ server.
+  version: 2.1.5
+
+servers:
+  - url: http://knoq.trap.jp/api
+    description: Production server
+  - url: http://ec2-54-238-146-214.ap-northeast-1.compute.amazonaws.com/api
+    description: Development server
+
+tags:
+  - name: rooms
+    description: traPが借りている講義室
+  - name: events
+    description: 予約
+  - name: groups
+    description: グループの情報
+  - name: users
+    description: ユーザー
+  - name: tags
+    description: タグ
+  - name: activity
+    description: activity
+  - name: authentication
+    description: 認証
+  - name: iCal
+    description: ics出力
+  - name: public
+    description: 外部公開API
+
+paths:
+  /rooms:
+    get:
+      tags:
+        - rooms
+      operationId: getRooms
+      summary: 進捗部屋の情報を取得
+      description: 進捗部屋の情報を取得
+      parameters:
+        - $ref: '#/components/parameters/dateBegin'
+        - $ref: '#/components/parameters/dateEnd'
+        - $ref: '#/components/parameters/excludeEventID'
+      responses:
+        '200':
+          $ref: '#/components/responses/RoomArray'
+    post:
+      tags:
+        - rooms
+      operationId: addRooms
+      summary: 部屋の情報追加
+      description: 部屋の情報追加
+      requestBody:
+        $ref: '#/components/requestBodies/Room'
+      responses:
+        '201':
+          $ref: '#/components/responses/Room'
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+
+  /rooms/{roomID}:
+    parameters:
+      - $ref: '#/components/parameters/excludeEventID'
+      - $ref: '#/components/parameters/roomID'
+    get:
+      tags:
+        - rooms
+      operationId: getRoom
+      summary: 一件取得する
+      description: 一件取得する
+      responses:
+        '200':
+          $ref: '#/components/responses/Room'
+    delete:
+      tags:
+        - rooms
+      summary: 部屋の情報を削除
+      description: (関連する予約を削除する)
+        エラーを出して削除を促す予定
+      operationId: deleteRoom
+      responses:
+        '200':
+          description: successful operation
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+
+  /rooms/{roomID}/verified:
+    parameters:
+      - $ref: '#/components/parameters/roomID'
+    post:
+      tags:
+        - rooms
+      operationId: verifyRoom
+      summary: 部屋を確認する
+      description: 特権が必要。部屋が使用できることを確認する
+      responses:
+        '200':
+          description: successful operation
+        '400':
+          description: Bad Request
+    delete:
+      tags:
+        - rooms
+      operationId: unverifyRoom
+      summary: 部屋を未確認にする
+      description: 特権が必要。部屋が使用できることの確認を取り消す。
+      responses:
+        '200':
+          description: successful operation
+        '403':
+          description: Forbidden
+        '400':
+          description: Bad Request
+
+  /rooms/all:
+    post:
+      tags:
+        - rooms
+      operationId: addAllRooms
+      summary: traPで確保した部屋の情報追加
+      description: 特権が必要。
+      requestBody:
+        description: 進捗部屋情報
+        required: true
+        content:
+          text/csv:
+            schema:
+              type: array
+              items:
+                type: object
+                properties:
+                  Subject:
+                    type: string
+                  Start date: &csvDate
+                    type: string
+                  End date: *csvDate
+                  Start time: &csvTime
+                    type: string
+                  End time: *csvTime
+                  Location:
+                    type: string
+            example: "Subject, Start date, End date, Start time, End time, Location\n, 2006/01/02, 2006/01/02, 15:04, 15:04, S516\n"
+      responses:
+        '201':
+          $ref: '#/components/responses/RoomArray'
+        '403':
+          description: Forbidden
+
+  /events:
+    get:
+      tags:
+        - events
+      summary: 使用宣言の情報を取得
+      description: 使用宣言の情報を取得
+      operationId: getEvents
+      parameters:
+        - $ref: '#/components/parameters/dateBegin'
+        - $ref: '#/components/parameters/dateEnd'
+        - $ref: '#/components/parameters/eventFilter'
+      responses:
+        '200':
+          $ref: '#/components/responses/EventArray'
+    post:
+      tags:
+        - events
+      summary: 部屋の使用宣言を行う
+      description: 部屋の使用宣言を行う
+      operationId: addEvents
+      requestBody:
+        $ref: '#/components/requestBodies/Event'
+      responses:
+        '201':
+          $ref: '#/components/responses/Event'
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+  /events/{eventID}:
+    parameters:
+      - $ref: '#/components/parameters/eventID'
+    get:
+      tags:
+        - events
+      summary: 一件取得
+      description: 一件取得
+      operationId: getEventDetail
+      responses:
+        '200':
+          $ref: '#/components/responses/Event'
+    put:
+      tags:
+        - events
+      summary: 部屋の使用宣言を更新
+      description: adminsのみ
+      operationId: updateEvent
+      requestBody:
+        $ref: '#/components/requestBodies/Event'
+      responses:
+        '200':
+          $ref: '#/components/responses/Event'
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+    delete:
+      tags:
+        - events
+      summary: 使用宣言を削除
+      description: adminsのみ
+      operationId: deleteEvent
+      responses:
+        '204':
+          $ref: '#/components/responses/Nocontent'
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+  /events/{eventID}/attendees/me:
+    parameters:
+      - $ref: '#/components/parameters/eventID'
+    put:
+      tags:
+        - events
+      operationId: updateSchedule
+      summary: 自分の参加予定を編集
+      requestBody:
+        $ref: '#/components/requestBodies/Schedule'
+      responses:
+        '204':
+          $ref: '#/components/responses/Nocontent'
+
+  /events/{eventID}/tags:
+    parameters:
+      - $ref: '#/components/parameters/eventID'
+    post:
+      tags:
+        - events
+      operationId: addEventTag
+      summary: タグを追加
+      description: タグを追加
+      requestBody:
+        $ref: '#/components/requestBodies/EventTag'
+      responses:
+        '204':
+          $ref: '#/components/responses/Nocontent'
+  /events/{eventID}/tags/{tagName}:
+    parameters:
+      - $ref: '#/components/parameters/eventID'
+      - name: tagName
+        in: path
+        required: true
+        schema:
+          type: string
+    delete:
+      tags:
+        - events
+      operationId: deleteEventTag
+      summary: タグを削除
+      description: locked=falseだけ
+      responses:
+        '204':
+          $ref: '#/components/responses/Nocontent'
+
+  /users/me/events:
+    get:
+      tags:
+        - events
+      parameters:
+        - $ref: '#/components/parameters/userRelation'
+      operationId: getMyEvents
+      description: 所属しているイベントを返す
+      responses:
+        '200':
+          $ref: '#/components/responses/EventArray'
+  /users/{userID}/events:
+    parameters:
+      - $ref: '#/components/parameters/userID'
+    get:
+      tags:
+        - events
+      parameters:
+        - $ref: '#/components/parameters/userRelation'
+      operationId: getUserEvents
+      description: 所属しているイベントを返す
+      responses:
+        '200':
+          $ref: '#/components/responses/EventArray'
+
+  /rooms/{roomID}/events:
+    parameters:
+      - $ref: '#/components/parameters/roomID'
+    get:
+      tags:
+        - events
+      operationId: getEventsOfRoom
+      description: 指定した部屋で行われるイベントを返す
+      responses:
+        '200':
+          $ref: '#/components/responses/EventArray'
+  /groups/{groupID}/events:
+    parameters:
+      - $ref: '#/components/parameters/groupID'
+    get:
+      tags:
+        - events
+      operationId: getEventsOfGroup
+      description: groupIdのeventsを取得
+      responses:
+        '200':
+          $ref: '#/components/responses/EventArray'
+
+  /groups:
+    get:
+      tags:
+        - groups
+      operationId: getGroups
+      summary: グループを全て取得
+      description: すべてのグループを取得する
+      responses:
+        '200':
+          $ref: '#/components/responses/GroupArray'
+        '400':
+          description: Bad Request
+    post:
+      tags:
+        - groups
+      operationId: createGroup
+      summary: グループ作成
+      description: グループを作成します。traQのグループとは無関係です。
+      requestBody:
+        $ref: '#/components/requestBodies/Group'
+      responses:
+        '201':
+          $ref: '#/components/responses/Group'
+        '400':
+          description: Bad Request
+
+  /groups/{groupID}:
+    parameters:
+      - $ref: '#/components/parameters/groupID'
+    get:
+      tags:
+        - groups
+      summary: 一件取得
+      description: 一件取得
+      operationId: getGroup
+      responses:
+        '200':
+          $ref: '#/components/responses/Group'
+    put:
+      tags:
+        - groups
+      description: adminsのみ変更可能
+      operationId: updateGroup
+      requestBody:
+        $ref: '#/components/requestBodies/Group'
+      responses:
+        '200':
+          $ref: '#/components/responses/Group'
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+    delete:
+      tags:
+        - groups
+      summary: Delete group
+      description: グループの削除
+      operationId: deleteGroup
+      responses:
+        '204':
+          description: successful operation
+          $ref: '#/components/responses/Nocontent'
+        '403':
+          description: Forbidden
+        '404':
+          description: Groupid not found
+
+  /groups/{groupID}/members/me:
+    parameters:
+      - $ref: '#/components/parameters/groupID'
+    put:
+      tags:
+        - groups
+      operationId: addMeToGroup
+      summary: 自分を追加。open=true
+      description: 自分をメンバーに追加する
+
+      responses:
+        '204':
+          $ref: '#/components/responses/Nocontent'
+    delete:
+      tags:
+        - groups
+      operationId: deleteMeFromGroup
+      summary: 自分しか削除出来ない。open=true
+      description: 自分しか削除出来ない。open=true
+      responses:
+        '204':
+          $ref: '#/components/responses/Nocontent'
+
+  /users/me/groups:
+    get:
+      tags:
+        - groups
+      parameters:
+        - $ref: '#/components/parameters/userRelation'
+      operationId: getMyGroups
+      description: 自分の所属しているグループのIDを返す
+      responses:
+        '200':
+          $ref: '#/components/responses/UUIDArray'
+  /users/{userID}/groups:
+    parameters:
+      - $ref: '#/components/parameters/userID'
+    get:
+      tags:
+        - groups
+      parameters:
+        - $ref: '#/components/parameters/userRelation'
+      operationId: getUserGroups
+      description: ユーザーが所属しているグループのIDを返す
+
+      responses:
+        '200':
+          $ref: '#/components/responses/UUIDArray'
+
+  /users:
+    get:
+      tags:
+        - users
+      operationId: getUsers
+      description: ユーザー一覧を返す
+      parameters:
+        - $ref: '#/components/parameters/include-suspended'
+      responses:
+        '200':
+          $ref: '#/components/responses/UserArray'
+  /users/sync:
+    post:
+      tags:
+        - users
+      operationId: syncUsers
+      description: 管理者権限が必要。
+        traQのuserと同期します。
+        存在していないユーザーは作成されます。
+        stateが同期されます。
+      responses:
+        '201':
+          description: OK
+
+  /users/me:
+    get:
+      tags:
+        - users
+      operationId: getMe
+      summary: 自分のユーザー情報を取得
+      description: 自分のユーザー情報を取得
+      responses:
+        '200':
+          $ref: '#/components/responses/User'
+  /users/me/ical:
+    get:
+      tags:
+        - users
+        - iCal
+      operationId: getIcalSecret
+      description: /ical で使う`secret`を取得
+      responses:
+        '200':
+          $ref: '#/components/responses/icalSecret'
+
+    put:
+      tags:
+        - users
+        - iCal
+      operationId: resetIcalSecret
+      description: /ical で使う`secret`を再生成
+      responses:
+        '200':
+          $ref: '#/components/responses/icalSecret'
+  /users/{userID}/privileged:
+    parameters:
+      - $ref: '#/components/parameters/userID'
+    patch:
+      tags:
+        - users
+      operationId: grantPrivilege
+      description: 管理者権限を付与したいuserのuserIDをパラメータに入れる. APIを叩く本人が管理者権限を持っている必要がある.
+      responses:
+        '204':
+          $ref: '#/components/responses/Nocontent'
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+
+  /tags:
+    get:
+      tags:
+        - tags
+      summary: タグを全て取得
+      description: タグを全て取得
+      operationId: getTag
+      responses:
+        '200':
+          $ref: '#/components/responses/TagArray'
+        '400':
+          description: Bad Request
+    post:
+      tags:
+        - tags
+      summary: タグを作成。
+      description: すでにある場合は、error
+      operationId: postTag
+      requestBody:
+        $ref: '#/components/requestBodies/Tag'
+      responses:
+        '201':
+          $ref: '#/components/responses/Tag'
+
+  /activity/events:
+    get:
+      deprecated: true
+      tags:
+        - activity
+        - events
+      operationId: getEventActivities
+      description: |
+        最近7日間に作成変更削除があったイベントを取得。
+        削除されたものを含んで返す。
+      responses:
+        '200':
+          $ref: '#/components/responses/EventArray'
+
+  /authParams:
+    post:
+      tags:
+        - authentication
+        - public
+      operationId: getAuthParams
+      description: リクエストに必要な情報を返す
+      responses:
+        '201':
+          description: リクエストに必要な情報を返す
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/authParams'
+  /callback:
+    get:
+      tags:
+        - authentication
+      operationId: getCallback
+      description: コールバックを検知して、トークンを取得します。
+      parameters:
+        - $ref: '#/components/parameters/session'
+        - name: code
+          in: query
+          required: true
+          description: OAuth2.0のcode
+          schema:
+            type: string
+      responses:
+        '302':
+          description: 成功。/callbackにリダイレクト。（その後はuiがリダイレクトする）
+
+  /ical/v1/{icalToken}:
+    get:
+      tags:
+        - iCal
+      operationId: getIcal
+      description: Icalを取得
+      parameters:
+        - $ref: '#/components/parameters/icalToken'
+        - $ref: '#/components/parameters/eventFilter'
+      responses:
+        '200':
+          description: |
+            iCal形式でイベントを出力
+            外部カレンダーを想定
+          content:
+            text/calendar:
+              schema:
+                type: string
+              example: "BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:github.com/lestrrat-go/ical\nBEGIN:VTIMEZONE\nTZID:Asia/Tokyo\nBEGIN:STANDARD\nDTSTART:19700101T000000\nTZNAME:JST\nTZOFFSETFROM:+9000\nTZOFFSETTO:+9000\nEND:STANDARD\nEND:VTIMEZONE\nBEGIN:VEVENT\nCREATED:20'200'827T09'400'8Z\nDESCRIPTION:asd¥n-----------------------------------¥nイベント詳細ページ¥nhttp://loc\nalhost:'400'0/events/855cff6d-aef6-4de2-8ba5-bc0c3e76a617\nDTEND:20'200'828T1'400'00Z\nDTSTAMP:20'200'904T145144Z\nDTSTART:20'200'828T050000Z\nLAST-MODIFIED:20'200'827T09'400'8Z\nLOCATION:dfaaa\nORGANIZER:18984a38-4dc7-41ab-9c8d-f5469a8e30a9\nSUMMARY:sadfwe\nUID:855cff6d-aef6-4de2-8ba5-bc0c3e76a617\nEND:VEVENT\nBEGIN:VEVENT\nCREATED:20'200'827T09'400'8Z\nDESCRIPTION:asd¥n-----------------------------------¥nイベント詳細ページ¥nhttp://loc\nalhost:'400'0/events/855cff6d-aef6-4de2-8ba5-bc0c3e76a617\nDTEND:20'200'828T1'400'00Z\nDTSTAMP:20'200'904T145144Z\nDTSTART:20'200'828T050000Z\nLAST-MODIFIED:20'200'827T09'400'8Z\nLOCATION:dfaaa\nORGANIZER:18984a38-4dc7-41ab-9c8d-f5469a8e30a9\nSUMMARY:sadfwe\nUID:855cff6d-aef6-4de2-8ba5-bc0c3e76a617\nEND:VEVENT\nEND:VCALENDAR"
+
+  /version:
+    get:
+      tags:
+        - public
+      operationId: getVersion
+      description: version情報を取得
+      responses:
+        '200':
+          description: versionを出力
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  version:
+                    type: string
+                    example: v2.1.3
+                  revision:
+                    type: string
+                    example: 587c185
+components:
+  schemas:
+    # will delete
+    UUIDs:
+      type: array
+      description: UUIDの配列
+      items:
+        type: string
+        format: uuid
+
+    ResponseUser:
+      type: object
+      properties:
+        userId: &uuid
+          type: string
+          format: uuid
+        name: &userName
+          type: string
+          example: fuji
+        displayName: &displayName
+          type: string
+          example: ふじ
+        icon: &icon
+          type: string
+          format: url
+          example: https://q.trap.jp/api/v3/public/icon/fuji
+        privileged: &privileged
+          type: boolean
+        state: &userState
+          type: integer
+          description: 'ユーザーアカウント状態 0: 停止 1: 有効 2: 一時停止'
+      required:
+        - userId
+        - name
+        - displayName
+        - icon
+        - privileged
+        - state
+
+    ResponseRoom:
+      type: object
+      properties:
+        roomId: *uuid
+        place: &place
+          type: string
+          example: S516
+        timeStart: &time
+          type: string
+          example: '2006-01-02T15:04:05Z'
+        timeEnd: *time
+        verified: &verified
+          type: boolean
+          description: 部屋が使えることを保証する
+        freeTimes:
+          description: どのイベントも使用していない時間帯
+          type: array
+          items:
+            $ref: '#/components/schemas/duration'
+        sharedTimes:
+          description: 部屋を共用すれば、使用できる時間帯
+          type: array
+          items:
+            $ref: '#/components/schemas/duration'
+        admins: &admins
+          type: array
+          description: 編集権を持つユーザー
+          items:
+            type: string
+            format: uuid
+        createdBy: *uuid
+        createdAt: *time
+        updatedAt: *time
+      required:
+        - roomId
+        - place
+        - timeStart
+        - timeEnd
+        - verified
+        - admins
+        - createdBy
+        - createdAt
+        - updatedAt
+
+    RequestRoom:
+      type: object
+      properties:
+        place: *place
+        timeStart: *time
+        timeEnd: *time
+        admins: *admins
+      required:
+        - place
+        - timeStart
+        - timeEnd
+        - admins
+
+    ResponseGroup:
+      type: object
+      properties:
+        groupId: *uuid
+        name: &groupName
+          type: string
+          example: room
+        description: &groupDescription
+          type: string
+          example: Sysad班room開発グループ
+        open: &open
+          type: boolean
+        isTraQGroup: &isTraQGroup
+          type: boolean
+          example: false
+        members: &members
+          type: array
+          description: グループのメンバー
+          items:
+            type: string
+            format: uuid
+        admins: *admins
+        createdBy: *uuid
+        createdAt: *time
+        updatedAt: *time
+      required:
+        - groupId
+        - name
+        - description
+        - open
+        - isTraQGroup
+        - members
+        - admins
+        - createdBy
+        - createdAt
+        - updatedAt
+
+    RequestGroup:
+      type: object
+      properties:
+        name: *groupName
+        description: *groupDescription
+        open: *open
+        members: *members
+        admins: *admins
+      required:
+        - name
+        - description
+        - open
+        - admins
+
+    ResponseTag:
+      type: object
+      properties: &tag
+        tagId: *uuid
+        name: &tagName
+          type: string
+          example: Vue
+        createdAt: *time
+        updatedAt: *time
+      required:
+        - tagId
+        - name
+        - createdAt
+        - updatedAt
+
+    RequestTag:
+      type: object
+      properties:
+        name: *tagName
+      required:
+        - name
+
+    ResponseEvent:
+      type: object
+      properties:
+        eventId: *uuid
+        name: &eventName
+          type: string
+          example: 第n回進捗回
+        description: &eventDescription
+          type: string
+          example: 第n回の進捗会です。
+        sharedRoom: &sharedRoom
+          type: boolean
+          description: 部屋の共用をするか
+        timeStart: *time
+        timeEnd: *time
+        place: *place
+        groupName: *groupName
+        roomId: *uuid
+        groupId: *uuid
+        open: &eventOpen
+          type: boolean
+          description: グループ外のユーザーが参加予定を出来るか
+        admins: *admins
+        tags: &eventTags
+          type: array
+          items:
+            type: object
+            description: タグの配列
+            properties:
+              tagId: *uuid
+              name: *tagName
+              locked: &locked
+                type: boolean
+            required:
+              - tagId
+              - name
+        attendees: &attendees
+          type: array
+          items:
+            type: object
+            description: ユーザの参加状況
+            properties:
+              userId: *uuid
+              schedule: &schedule
+                type: string
+                enum: [pending, absent, attendance]
+                description: pending or absent or attendance
+            required:
+              - userId
+              - schedule
+        createdBy: *uuid
+        createdAt: *time
+        updatedAt: *time
+      required:
+        - eventId
+        - name
+        - description
+        - sharedRoom
+        - timeStart
+        - timeEnd
+        - place
+        - groupName
+        - open
+        - roomId
+        - groupId
+        - admins
+        - tags
+        - attendees
+        - createdBy
+        - createdAt
+        - updatedAt
+
+    ResponseEventDetail:
+      type: object
+      properties:
+        eventId: *uuid
+        name: *eventName
+        description: *eventDescription
+        sharedRoom: *sharedRoom
+        timeStart: *time
+        timeEnd: *time
+        place: *place
+        groupName: *groupName
+        open: *eventOpen
+        room:
+          $ref: '#/components/schemas/ResponseRoom'
+        group:
+          $ref: '#/components/schemas/ResponseGroup'
+        admins: *admins
+        tags: *eventTags
+        attendees: *attendees
+        createdBy: *uuid
+        createdAt: *time
+        updatedAt: *time
+      required:
+        - eventId
+        - name
+        - description
+        - sharedRoom
+        - timeStart
+        - timeEnd
+        - place
+        - groupName
+        - open
+        - room
+        - group
+        - admins
+        - tags
+        - attendees
+        - createdBy
+        - createdAt
+        - updatedAt
+
+    RequestEventInstant:
+      type: object
+      description: 部屋を作る
+      properties:
+        name: *eventName
+        description: *eventDescription
+        sharedRoom: *sharedRoom
+        timeStart: *time
+        timeEnd: *time
+        place: *place
+        groupId: *uuid
+        open: *eventOpen
+        admins: *admins
+        tags: &reqEventTags
+          type: array
+          items:
+            type: object
+            properties:
+              name: *tagName
+              locked: *locked
+            required:
+              - tagName
+      required:
+        - name
+        - description
+        - sharedRoom
+        - timeStart
+        - timeEnd
+        - place
+        - groupId
+        - admins
+
+    RequestEventStock:
+      type: object
+      description: 既存の部屋を使う
+      properties:
+        name: *eventName
+        description: *eventDescription
+        sharedRoom: *sharedRoom
+        timeStart: *time
+        timeEnd: *time
+        roomId: *uuid
+        groupId: *uuid
+        open: *eventOpen
+        admins: *admins
+        tags: *reqEventTags
+      required:
+        - name
+        - description
+        - sharedRoom
+        - timeStart
+        - timeEnd
+        - roomId
+        - groupId
+        - admins
+
+    RequestEvent:
+      oneOf:
+        - $ref: '#/components/schemas/RequestEventInstant'
+        - $ref: '#/components/schemas/RequestEventStock'
+
+    RequestSchedule:
+      type: object
+      properties:
+        schedule: *schedule
+      required:
+        - schedule
+
+    duration:
+      type: object
+      properties:
+        timeStart: *time
+        timeEnd: *time
+      required:
+        - timeStart
+        - timeEnd
+
+    authParams:
+      type: object
+      properties:
+        url:
+          type: string
+          format: url
+          example: 'https://q.trap.jp/api/v3/oauth2/authorize'
+      required:
+        - url
+
+    icalSecret:
+      type: object
+      properties:
+        secret:
+          type: string
+      required:
+        - secret
+
+    icalToken:
+      type: string
+      description: userIdとicalのsecretをつなげたもの
+
+  requestBodies:
+    Group:
+      description: グループの追加
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RequestGroup'
+
+    Room:
+      description: 部屋の追加
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RequestRoom'
+
+    Tag:
+      description: タグ自体の追加
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RequestTag'
+
+    Event:
+      description: 予約の編集
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RequestEvent'
+            example:
+              name: イベント
+              description: これはイベントです。
+              sharedRoom: true
+              timeStart: '2006-01-02T15:04:05Z'
+              timeEnd: '2006-01-02T15:04:05Z'
+              place: Discord
+              groupId: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+              admins:
+                - 3fa85f64-5717-4562-b3fc-2c963f66afa6
+              tags:
+                - name: golang
+                  locked: true
+
+    EventTag:
+      description: イベントにタグを追加
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RequestTag'
+
+    Schedule:
+      description: イベントの参加予定を更新
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RequestSchedule'
+
+  responses:
+    Nocontent:
+      description: Nocontent
+
+    UUIDArray:
+      description: successful operation
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UUIDs'
+
+    Room:
+      description: successful operation
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ResponseRoom'
+    RoomArray:
+      description: successful operation
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/ResponseRoom'
+    Event:
+      description: successful operation
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ResponseEventDetail'
+
+    EventArray:
+      description: successful operation
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/ResponseEvent'
+    Group:
+      description: successful operation
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ResponseGroup'
+    GroupArray:
+      description: successful operation
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/ResponseGroup'
+    User:
+      description: successful operation
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ResponseUser'
+    UserArray:
+      description: successful operation
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/ResponseUser'
+
+    icalSecret:
+      description: successful operation
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/icalSecret'
+
+    Tag:
+      description: successful operation
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ResponseTag'
+    TagArray:
+      description: successful operation
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/ResponseTag'
+
+  parameters:
+    session:
+      name: session
+      in: cookie
+      required: true
+      schema:
+        type: string
+
+    icalToken:
+      name: icalToken
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/icalToken'
+    eventFilter:
+      name: q
+      in: query
+      schema:
+        type: string
+      description: 'Syntax: <br>
+        top  : ε | expr,
+        expr : term ( ( "||" | "&&" ) term)*<br>
+        term : cmp | "(" expr ")"<br>
+        cmp  : Attr ( "==" | "!=" ) UUID<br>
+        Attr : "event" | "user" | "group" | "tag"
+        '
+    dateBegin:
+      name: dateBegin
+      in: query
+      description: 特定の日時から。
+      required: false
+      schema:
+        type: string
+        format: datetime
+      example: '2006-01-02T15:04:05Z'
+    dateEnd:
+      name: dateEnd
+      in: query
+      description: 特定の日時まで。
+      required: false
+      schema:
+        type: string
+        format: datetime
+      example: '2006-01-02T15:04:05Z'
+    excludeEventID:
+      name: excludeEventID
+      in: query
+      description: 除外するイベントのID。
+      required: false
+      schema:
+        type: string
+        format: uuid
+      example: '3fa85f64-5717-4562-b3fc-2c963f66afa6'
+
+    include-suspended:
+      name: include-suspended
+      in: query
+      description: アカウントがアクティブでないユーザーを含めるかどうか。 |
+        traQ由来のquery。 |
+        de
+      required: false
+      schema:
+        type: boolean
+        example: false
+
+    userRelation:
+      name: relation
+      in: query
+      required: false
+      description: |
+        どのような関係性でユーザーと結びつけるか。 取り得る値は、
+        admins(ユーザーが管理者), belongs(ユーザーが所属している), 
+        belongs-or-admins(ユーザーが管理者または所属している) 
+        イベントはさらに、attendees(not absent) 値がない場合は、belongs として振る舞う
+      schema:
+        type: string
+        enum:
+          - admins
+          - belongs
+          - belongs-or-admins
+          - attendees
+
+    userID:
+      name: userID
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    groupID:
+      name: groupID
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    roomID:
+      name: roomID
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    eventID:
+      name: eventID
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+
+externalDocs:
+  description: Find out more about Swagger
+  url: http://swagger.io

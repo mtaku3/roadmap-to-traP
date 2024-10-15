@@ -216,6 +216,54 @@
         }
       }
     },
+    "tailwindcss-language-server@latest": {
+      "last_modified": "2024-09-10T15:01:03Z",
+      "resolved": "github:NixOS/nixpkgs/5ed627539ac84809c78b2dd6d26a5cebeb5ae269#tailwindcss-language-server",
+      "source": "devbox-search",
+      "version": "0.0.21",
+      "systems": {
+        "aarch64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/awlq98f22nzql8s8xh2y45nznzb92b59-tailwindcss-language-server-0.0.21",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/awlq98f22nzql8s8xh2y45nznzb92b59-tailwindcss-language-server-0.0.21"
+        },
+        "aarch64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/nycf9qqphrh6vd7y0c03zxhdibpvbmmx-tailwindcss-language-server-0.0.21",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/nycf9qqphrh6vd7y0c03zxhdibpvbmmx-tailwindcss-language-server-0.0.21"
+        },
+        "x86_64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/qxhhqwsbh3jjk4x4411z7rk33c27f4sb-tailwindcss-language-server-0.0.21",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/qxhhqwsbh3jjk4x4411z7rk33c27f4sb-tailwindcss-language-server-0.0.21"
+        },
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/fzlkpk5p2w7piqc6vvxvky4zbswc1fms-tailwindcss-language-server-0.0.21",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/fzlkpk5p2w7piqc6vvxvky4zbswc1fms-tailwindcss-language-server-0.0.21"
+        }
+      }
+    },
     "typescript-language-server@latest": {
       "last_modified": "2024-09-29T22:19:52Z",
       "resolved": "github:NixOS/nixpkgs/4e0c36e4dd53f35d5a6385bdae88895ec5832f70#typescript-language-server",

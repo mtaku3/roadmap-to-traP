@@ -2,8 +2,8 @@ package model
 
 type User struct {
 	Base
-	TrapName  string     `gorm:"unique"`
-	Workshops []Workshop `gorm:"foreignKey:AuthorID"`
+	TrapName  string     `gorm:"unique" json:"trap_name"`
+	Workshops []Workshop `gorm:"foreignKey:AuthorID" json:"-"`
 }
 
 func GetUserByTrapName(trapName string) (User, error) {
