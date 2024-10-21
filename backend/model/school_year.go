@@ -2,11 +2,11 @@ package model
 
 type SchoolYear struct {
 	Base
-	Year        uint `gorm:"unique"`
-	DisplayName string
-	ShortName   string
+	Year        uint   `gorm:"unique" json:"year"`
+	DisplayName string `json:"display_name"`
+	ShortName   string `json:"short_name"`
 
-	Workshops []Workshop
+	Workshops []Workshop `json:"-"`
 }
 
 func GetSchoolYearByYear(year uint) (SchoolYear, error) {
