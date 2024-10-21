@@ -15,5 +15,5 @@ func Init() error {
 }
 
 func Migrate() error {
-	return db.AutoMigrate(&User{}, &SchoolYear{}, &Workshop{}, &Lecture{}, &TraqEvent{})
+	return db.AutoMigrate(&User{}, &SchoolYear{}, &Workshop{}, &Lecture{}, &TraQEvent{})
 }

@@ -2,7 +2,7 @@ package model
 
 import "github.com/google/uuid"
 
-type TraqEvent struct {
+type TraQEvent struct {
 	Base
 	EventID uuid.UUID `json:"event_id"`
 

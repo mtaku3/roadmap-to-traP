@@ -12,5 +12,5 @@ type Lecture struct {
 	WorkshopID uuid.UUID `gorm:"size:191" json:"workshop_id"`
 	Workshop   Workshop  `gorm:"foreignKey:WorkshopID" json:"-"`
 
-	Events []TraqEvent `json:"events"`
+	Events []TraQEvent `json:"events"`
 }
