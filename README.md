@@ -1,36 +1,50 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# roadmap-to-traP
 
-## Getting Started
+A Next.js web app that helps [traP](https://trap.jp/) (Tokyo Tech's programming/creator circle) members discover and plan a learning roadmap by integrating with internal services such as [traQ](https://github.com/traPtitech/traQ) and [knoQ](https://github.com/traPtitech/knoQ).
 
-First, run the development server:
+> **Status:** Archived. This repository is no longer maintained.
+
+## Stack
+
+- [Next.js](https://nextjs.org/) (Pages Router) + TypeScript
+- [tRPC](https://trpc.io/) for end-to-end typed APIs
+- [Prisma](https://www.prisma.io/) ORM
+- [Mantine](https://mantine.dev/) + [Tailwind CSS](https://tailwindcss.com/) for UI
+- [React Flow](https://reactflow.dev/) + [dagre](https://github.com/dagrejs/dagre) for roadmap graph rendering
+- [Jotai](https://jotai.org/), [TanStack Query](https://tanstack.com/query), [react-hook-form](https://react-hook-form.com/)
+- traQ OIDC for authentication (`openid-client`, `jose`)
+
+## Getting started
+
+Requirements: Node.js 20+, pnpm, Docker (for the dev database).
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install
+docker compose up -d        # Postgres
+pnpm prisma migrate dev
+pnpm dev                    # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Environment variables are validated by `src/env.js` (see [@t3-oss/env-nextjs](https://env.t3.gg/)). Copy and fill in a `.env` accordingly.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Generating external API clients
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+```bash
+pnpm og:traq    # regenerate traQ client
+pnpm og:knoq    # regenerate knoQ client
+```
 
-## Learn More
+## Project layout
 
-To learn more about Next.js, take a look at the following resources:
+```
+src/
+  client/    # React UI components, hooks, pages assets
+  modules/   # Domain modules (DDD-ish): infra (prisma), external (traq, knoq), ...
+  pages/     # Next.js Pages Router entries + API routes
+  server/    # tRPC routers, server-side wiring
+  trpc/      # tRPC client/server setup
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## License
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+[MIT](./LICENSE) © mtaku3
